@@ -5,13 +5,15 @@ LDFLAGS=-L.
 
 EXE=a
 
-.PHONY: all
+.PHONY: all clean
 
 debug: CXXFLAGS += -g3
 debug: all
 
 all: a
-	
+
+run:
+	./a
 
 clean:
 	$(RM) $(EXE) *.o
