@@ -1,0 +1,17 @@
+language: cpp
+dist: trusty
+compiler:
+- clang
+- g++
+os:
+- linux
+script:
+        test.sh
+branches:
+        only:
+        - master
+notification:
+        email:false
+env:
+        global:
+        - LANG="en_US.UTF-8"
