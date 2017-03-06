@@ -21,7 +21,7 @@ endif
 #Change working directory
 #CWD=./src/
 
-.PHONY: all clean run
+.PHONY: all clean run doc
 
 all: $(GUI) $(CLI)
 
@@ -37,10 +37,15 @@ $(CLI):
 run:
 	./hra2017_cli
 
+doc:
+	cd src/ && doxygen doxyfile
+
 #FIXME recursive
 zip: src/* examples/* doc/ Makefile README.txt
 	zip xvasko12_xtamas01.zip -r $^
 
 #FIXME doxygen doxyfile
 clean:
-	$(RM) $(GUI) $(CLI) && $(MAKE) clean
+	$(RM) $(GUI) $(CLI)
+	@cd src/ && $(MAKE) clean
+	$(RM) -r ./doc/*
