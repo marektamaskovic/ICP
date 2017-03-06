@@ -6,13 +6,13 @@ compiler:
 - g++
 os:
 - linux
-script:
-        make && make run
-branches:
-        only:
-        - master
 notification:
         email:false
 env:
         global:
         - LANG="en_US.UTF-8"
+branches:
+        only:
+        - master
+script:
+        make && make run

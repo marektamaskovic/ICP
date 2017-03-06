@@ -17,6 +17,9 @@ GUI:
 	@echo -n "."
 	@sleep 1
 
+CLI:
+	cp a hra2017_cli
+
 all: a
 
 clean:
