@@ -1,5 +1,9 @@
 ###############################################################################
-# xTamas and xVasko presents the ultimate survival Klondike guide             #
+# xTamas01 and xVasko12 presents the ultimate survival Klondike guide         #
+# Project: ICP17, a Klondike (Solitaire) game                                 #
+# FIT VUT Brno                                                                #
+# Authors: xtamas01 - Tamaškovič Marek                                        #
+#          xvasko12 - Vaško Martin                                            #
 # Makefile supports various types of architectures, machines and much more... #
 # supports commands: make, make clean, make gui, make cli, make zip, make run #
 ###############################################################################
