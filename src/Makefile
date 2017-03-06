@@ -7,7 +7,9 @@ EXE=a
 
 .PHONY: GUI all clean
 
-GUI:
+all: a
+
+GUI: all
 	@echo -n "building gui "
 	@sleep 1
 	@echo -n "."
@@ -16,11 +18,11 @@ GUI:
 	@sleep 1
 	@echo -n "."
 	@sleep 1
+	cp a hra2017_gui
 
 CLI:
 	cp a hra2017_cli
 
-all: a
 
 clean:
 	@echo "cleaning like mexican cleaning lady"
