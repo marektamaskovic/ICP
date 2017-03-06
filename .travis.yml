@@ -1,17 +1,33 @@
 sudo: required
 language: cpp
 dist: trusty
+language:
+- cpp
 compiler:
 - g++
-os:
-- linux
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-6
+      - g++-6
+      - cmake
+
 notification:
-        email:false
+  email:false
 env:
-        global:
-        - LANG="en_US.UTF-8"
+  global:
+  - LANG="en_US.UTF-8"
 branches:
-        only:
-        - master
+  only:
+    - master
 script:
-        make && make run
+
+  - ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
+  - ln -s /usr/bin/g++-6 /usr/local/bin/g++
+  - export CC=/usr/bin/gcc-6
+  - export CXX=/usr/bin/g++-6
+  - gcc -v && g++ -v && cmake --version
+  - make && make run
