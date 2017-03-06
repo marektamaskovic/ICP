@@ -13,21 +13,25 @@
 #include <algorithm>
 #include <vector>
 
-#ifndef
+#ifndef CLASSES
 #define CLASSES
 
 //enum symbol{A=1,J=11,Q,K};
-/* TODO Doxygen */
+// TODO Doxygen
+
 class Card;
 class Game;
 class Deck;
+
+
 
 typedef struct {
   Deck &from;
   Deck &to;
   Card &card;
-  unsigned numberOfCards; //successor
+  unsigned numberOfCards; // successor
 }Move;
+
 
 class Card{
   enum Color{heart,spade,diamond,club};
