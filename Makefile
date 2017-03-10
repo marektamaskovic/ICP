@@ -26,11 +26,11 @@ endif
 all: $(GUI) $(CLI)
 
 $(GUI):
-	@cd src/ && $(MAKE) GUI
+	@cd src/ && $(MAKE) hra2017
 	cp src/$(GUI) ./
 
 $(CLI):
-	@cd src/ && $(MAKE) CLI
+	@cd src/ && $(MAKE) hra2017-cli
 	cp src/$(CLI) ./
 
 #FIXME, run CLI or GUI?

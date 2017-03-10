@@ -2,27 +2,22 @@ CXX=g++
 CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++14 -Weffc++
 CXXLIBS=
 LDFLAGS=-L.
+DEPS= classes.o
+BIN=hra2017 hra2017-cli
 
-EXE=a
+.PHONY: hra2017 hra2017-cli all clean
 
-.PHONY: GUI all clean
+all: hra2017 hra2017-cli
 
-all: a
+hra2017: main.cpp $(DEPS)
+	@echo "=== Building GUI "
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+hra2017-cli: main.cpp $(DEPS)
+	@echo "=== Building CLI "
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 
-GUI: all
-	@echo -n "building gui "
-	@sleep 1
-	@echo -n "."
-	@sleep 1
-	@echo -n "."
-	@sleep 1
-	@echo -n "."
-	@sleep 1
-	cp a hra2017_gui
-
-CLI:
-	cp a hra2017_cli
 
 
 clean:
 	@echo "cleaning like mexican cleaning lady"
+	rm $(BIN)

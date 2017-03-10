@@ -5,16 +5,10 @@
  *          xvasko12 - Vaško Martin
  */
 
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <cstdio>
-#include <cstdlib>
-#include <algorithm>
-#include <vector>
-
 #ifndef CLASSES
 #define CLASSES
+
+#include <vector>
 
 //enum symbol{A=1,J=11,Q,K};
 // TODO Doxygen
@@ -32,59 +26,60 @@ typedef struct {
   unsigned numberOfCards; // successor
 }Move;
 
-
 class Card{
   enum Color{heart,spade,diamond,club};
 public:
   Color color;
   int number;
-  Card successor;
+  Card &successor;
   bool visible;
 
   Card();
   ~Card();
-  changeVisibility();
+  int changeVisibility(void);
+};
+
+class Game{
+public:
+  std::vector<Move> history [5];
+  std::vector<Card> mainDeck [52];
+  Game();
+  ~Game();
+  /* FILE */
+  int save();
+  int load();
+  Move* hint();
+  static inline int numberOfGames(){ return current_count; }
+
+private:
+  int id = 0;
+  int position = 0;
+
+  static int current_count;
 };
 
 class Deck : public Game{
+private:
+  enum Permissions{insert=1, get, insert_get};
+  enum Position{flipDeck=1, flopDeck, starterDeck, finalDeck};
+
+  int checkValidity(void);
 public:
-  std::vector<&Card> cards;
+  std::vector<Card> cards;
   Position position;
   Permissions permissions;
 
   Deck();
   ~Deck();
   /* deck to deck change, vect cards, position, checkValidity() */
-  insertCards();
+  int insertCards();
   /* using successor of Cards (Card::successor) */
-  getCards();
+  Card& getCards(void);
   /* decorator fnc */
-  getLastCard();
-private:
-  enum Permissions{insert=1, get, insert_get};
-  enum Position{flipDeck=1, flopDeck, starterDeck, finalDeck};
-
-  checkValidity();
+  Card& getLastCard();
 };
 
-class Game{
-public:
-  std::vector<Move> history;
-  std::vector<&Card> mainDeck;
+int Game::current_count = 0;
 
-  Game();
-  ~Game();
-  /* FILE */
-  save();
-  load();
-  hint();
-  static inline numberOfGames(){ return current_count; }
-
-private:
-  int id;
-  int position;
-
-  static int current_count=0;
-};
 
 #endif
