@@ -18,20 +18,22 @@ else
 	GUI=hra2017
 	CLI=hra2017_cli
 endif
-#Change working directory
-#CWD=./src/
 
-.PHONY: all clean run doc
+.PHONY: all clean run doc travis_compile
 
 all: $(GUI) $(CLI)
 
 $(GUI):
-	@cd src/ && $(MAKE) hra2017
+	@cd src/ && $(MAKE) $@
 	cp src/$(GUI) ./
 
 $(CLI):
-	@cd src/ && $(MAKE) hra2017-cli
+	@cd src/ && $(MAKE) $@
 	cp src/$(CLI) ./
+
+travis_compile:
+	@cd src/ && $(MAKE) hra2017_cli-tr
+	cp src/hra2017_cli ./
 
 #FIXME, run CLI or GUI?
 run:

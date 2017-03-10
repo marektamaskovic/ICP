@@ -12,12 +12,13 @@ all: hra2017 hra2017-cli
 hra2017: main.cpp $(DEPS)
 	@echo "=== Building GUI "
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
-hra2017-cli: main.cpp $(DEPS)
+hra2017_cli: main.cpp $(DEPS)
 	@echo "=== Building CLI "
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
 
-
+hra2017_cli-tr: CXX=g++-6
+hra2017_cli-tr: hra2017_cli
 
 clean:
 	@echo "cleaning like mexican cleaning lady"
-	rm $(BIN)
+	rm $(BIN) *.o
