@@ -9,7 +9,6 @@
 #define CLASSES
 
 #include <vector>
-
 #include "core.h"
 
 //enum symbol{A=1,J=11,Q,K};
@@ -21,66 +20,71 @@ class Deck;
 
 
 typedef struct {
-  Deck &from;
-  Deck &to;
-  Card &card;
-  unsigned numberOfCards; // successor
+	Deck *from;
+	Deck *to;
+	Card &card;
+	unsigned numberOfCards; // successor
 }Move;
 
-class Card{
-  enum Color{heart,spade,diamond,club};
+class Card final{
+	enum Color{heart,spade,diamond,club};
 public:
-  Color color;
-  int number;
-  Card &successor;
-  bool visible;
+	int number;
+	Color color;
+	bool visible;
+	Card *successor;
 
-  Card();
-  int changeVisibility(void);
+	Card(int ,Color);
+	int changeVisibility(void);
 };
 
-class Game{
+class Game {
 public:
-  std::vector<Move> history [5];
-  std::vector<Card> mainDeck [52];
-  int m = 0;
-  Game();
-  ~Game();
-  /* FILE */
-  int save();
-  int load();
-  Move* hint();
-  static inline int numberOfGames(){ return current_count; }
-  static int current_count;
+	std::vector<Move> history [5];
+	std::vector<Card> mainDeck [52];
+	int m = 0;
+	Game();
+	~Game();
+	/* FILE */
+	int save();
+	int load();
+	static inline int numberOfGames(){ return current_count; }
+	static int current_count;
 
 private:
-  int id = 0;
-  int position = 0;
-
+	int id = 0;
+	int position = 0;
 };
 
-class Deck : public Game{
+class Deck final: public Game{
 private:
-  enum Permissions{insert=1, get, insert_get};
-  enum Position{flipDeck=1, flopDeck, starterDeck, finalDeck};
-
-  int checkValidity(void);
+	enum Position{flipDeck=1, flopDeck, starterDeck, finalDeck};
+	enum Permissions{insert=1, get, insert_get};
+	int checkValidity(Deck *);
 public:
-  std::vector<Card> cards;
-  Position position;
-  Permissions permissions;
+	std::vector<Card> cards;
+	Position position;
+	Permissions permissions;
 
-  Deck();
-  ~Deck();
-  /* deck to deck change, vect cards, position, checkValidity() */
-  int insertCards();
-  /* using successor of Cards (Card::successor) */
-  Card& getCards(void);
-  /* decorator fnc */
-  Card& getLastCard();
+	Deck(Permissions ,Position );
+	~Deck();
+	/* deck to deck change, vect cards, position, checkValidity() */
+	int insertCards(Card *);
+	/* using successor of Cards (Card::successor) */
+	std::vector<Card> getCards(Card *);
+	/* decorator fnc */
+	Card& getLastCard();
+	Move* hint(Deck *);
 };
 
-// int Game::current_count = 0;
 
 
 #endif
+// class Move {
+// private:
+// 	Deck *deck;
+// public:
+// 	void execute(){
+// 		(deck->*method)();
+// 	}
+// };
