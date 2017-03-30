@@ -20,7 +20,6 @@ class Game;
 class Deck;
 
 
-
 typedef struct {
   Deck &from;
   Deck &to;

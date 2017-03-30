@@ -36,7 +36,47 @@ command_t* parseCMD(std::string &cmdBuffer){
 
 	}
 
-	// std::cout << "Args: '" << arg_buff << "'" << std::endl;
+	std::regex show_regex("show([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, show_regex) > 0){
+		cmd->type = show;
+		return cmd;
+	}
+
+	std::regex moveC_regex("moveCard([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, moveC_regex) > 0){
+		cmd->type = moveCard;
+		return cmd;
+	}
+
+	std::regex popQD_regex("popQueueDeck([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, popQD_regex) > 0){
+		cmd->type = popQueueDeck;
+		return cmd;
+	}
+
+	std::regex moveD_regex("moveDeck([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, moveD_regex) > 0){
+		cmd->type = moveDeck;
+		return cmd;
+	}
+
+	std::regex switchG_regex("switchGame([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, switchG_regex) > 0){
+		cmd->type = switchGame;
+		return cmd;
+	}
+
+	std::regex save_regex("save([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, save_regex) > 0){
+		cmd->type = save;
+		return cmd;
+	}
+
+	std::regex load_regex("load([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, load_regex) > 0){
+		cmd->type = load;
+		return cmd;
+	}
 
 	std::regex createGame_regex("createGame([A-z,\\ ]*)", std::regex::grep);
 	if(std::regex_match(cmdBuffer, createGame_regex) > 0){
@@ -44,9 +84,15 @@ command_t* parseCMD(std::string &cmdBuffer){
 		return cmd;
 	}
 
-	std::regex show_regex("show([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, show_regex) > 0){
-		cmd->type = show;
+	std::regex quitG_regex("quitGame([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, quitG_regex) > 0){
+		cmd->type = quitGame;
+		return cmd;
+	}
+
+	std::regex quit_regex("quit([A-z,\\ ]*)", std::regex::grep);
+	if(std::regex_match(cmdBuffer, quit_regex) > 0){
+		cmd->type = quit;
 		return cmd;
 	}
 

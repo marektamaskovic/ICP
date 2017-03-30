@@ -17,6 +17,12 @@ int main(int argc, char *argv[]){
 	(void) argc;
 	(void) argv;
 
+	session_t session;
+
+	session[0] = new Game();
+
+	(void)session;
+
 	std::string cmdBuffer = "";
 
 	std::cout << ">>> ";

@@ -12,16 +12,25 @@
 ifeq ($(OS),Windows_NT)
 	#REMOVE =del
 	GUI=hra2017.exe
-	CLI=hra2017_cli.exe
+	CLI=hra2017-cli.exe
 else
 	#libraries
 	GUI=hra2017
-	CLI=hra2017_cli
+	CLI=hra2017-cli
 endif
+
+#Colors
+GREEN=\033[1;32m
+RED=\033[1;31m
+CYAN=\033[1;36m
+NC=\033[0m
 
 .PHONY: all clean run doc travis_compile
 
-all: $(GUI) $(CLI)
+all: welcom_msg $(GUI) $(CLI)
+
+welcom_msg:
+	@echo -e "$(CYAN)=== ICP PROJECT 2017 ===$(NC)"
 
 $(GUI):
 	@cd src/ && $(MAKE) $@
@@ -33,11 +42,11 @@ $(CLI):
 
 travis_compile:
 	@cd src/ && $(MAKE) hra2017_cli-tr
-	cp src/hra2017_cli ./
+	cp src/hra2017_cli ./hra2017-cli-tr
 
 #FIXME, run CLI or GUI?
 run:
-	./hra2017_cli
+	./hra2017-cli
 
 doc:
 	cd src/ && doxygen doxyfile
@@ -48,6 +57,7 @@ zip: src/* examples/* doc/ Makefile README.txt
 
 #FIXME doxygen doxyfile
 clean:
+	@echo -e "$(RED)=== Cleaning $(NC)"
 	$(RM) $(GUI) $(CLI)
 	@cd src/ && $(MAKE) clean
 	$(RM) -r ./doc/*

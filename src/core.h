@@ -3,6 +3,10 @@
 
 #include <string>
 
+#include "classes.h"
+
+typedef class Game* session_t[4];
+
 typedef enum{
 	noCMD = -1,
 	createGame,
@@ -18,8 +22,8 @@ typedef enum{
 } command_n;
 
 typedef struct{
-	command_n type;
-	std::vector<std::string> args;
+	command_n type = noCMD;
+	std::vector<std::string> args {""};
 } command_t;
 
 
