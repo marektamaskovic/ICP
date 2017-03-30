@@ -1,24 +1,29 @@
 CXX=g++
-CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++14 -Weffc++
+CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++14
 CXXLIBS=
 LDFLAGS=-L.
-DEPS= classes.o
-BIN=hra2017 hra2017-cli
+DEPS=core.o classes.o
+BIN=hra2017 hra2017_cli
+
+#Colors
+GREEN=\033[1;32m
+RED=\033[1;31m
+NC=\033[0m
 
 .PHONY: hra2017 hra2017-cli all clean
 
 all: hra2017 hra2017-cli
 
-hra2017: main.cpp $(DEPS)
-	@echo "=== Building GUI "
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
-hra2017_cli: main.cpp $(DEPS)
-	@echo "=== Building CLI "
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< -o $@
+hra2017: main.o $(DEPS)
+	@echo -e "$(GREEN)=== Building GUI $(NC)"
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< $(DEPS) -o $@
+hra2017_cli: main.o $(DEPS)
+	@echo -e "$(GREEN)=== Building CLI $(NC)"
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< $(DEPS) -o $@
 
 hra2017_cli-tr: CXX=g++-6
 hra2017_cli-tr: hra2017_cli
 
 clean:
-	@echo "cleaning like mexican cleaning lady"
+	@echo -e "$(RED)cleaning like mexican cleaning lady $(NC)"
 	rm $(BIN) *.o

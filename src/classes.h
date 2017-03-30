@@ -10,6 +10,8 @@
 
 #include <vector>
 
+#include "core.h"
+
 //enum symbol{A=1,J=11,Q,K};
 // TODO Doxygen
 
@@ -35,7 +37,6 @@ public:
   bool visible;
 
   Card();
-  ~Card();
   int changeVisibility(void);
 };
 
@@ -43,6 +44,7 @@ class Game{
 public:
   std::vector<Move> history [5];
   std::vector<Card> mainDeck [52];
+  int m = 0;
   Game();
   ~Game();
   /* FILE */
@@ -50,12 +52,12 @@ public:
   int load();
   Move* hint();
   static inline int numberOfGames(){ return current_count; }
+  static int current_count;
 
 private:
   int id = 0;
   int position = 0;
 
-  static int current_count;
 };
 
 class Deck : public Game{
@@ -79,7 +81,7 @@ public:
   Card& getLastCard();
 };
 
-int Game::current_count = 0;
+// int Game::current_count = 0;
 
 
 #endif

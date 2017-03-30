@@ -1,9 +1,31 @@
 #ifndef CORE
 #define CORE
 
-static int position[] = {0,0,0,0};
+#include <string>
 
-int getPosition(void){
+typedef enum{
+	noCMD = -1,
+	createGame,
+	switchGame,
+	quitGame,
+	save,
+	load,
+	show,
+	quit,
+	popQueueDeck,
+	moveCard,
+	moveDeck
+} command_n;
+
+typedef struct{
+	command_n type;
+	std::vector<std::string> args;
+} command_t;
+
+
+static int position[] = {0, 0, 0, 0};
+
+inline int getPosition(void){
 	for (int i = 0; i < 4; i++)
 	{
 		if (position[i] == 0)
@@ -12,5 +34,8 @@ int getPosition(void){
 
 	return -1;
 }
+
+command_t *parseCMD(std::string&);
+int resolveCmd(std::string&);
 
 #endif

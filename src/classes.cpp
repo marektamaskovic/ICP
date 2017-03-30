@@ -1,6 +1,8 @@
 #include "classes.h"
 #include "core.h"
 
+int Game::current_count = 0;
+
 
 Game::Game(){
 	current_count++;
