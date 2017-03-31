@@ -5,15 +5,14 @@
 #include <iostream>
 #include "classes.h"
 
-typedef struct session_t{
+typedef struct{
 	class Game* slot[4];
-	bool Bool[4];
-}session;
+	bool openSlot[4] = {false,};
+	int isSpace(void); // return position of first open slot or -1 when error
+	int addGame(class Game*);
+	int removeGame(int noSlot);
 
-/*
- *  TODO
- *	should be struct with flag for each gameslot.
- */
+}session_t;
 
 typedef enum{
 	noCMD = -1,
@@ -87,8 +86,8 @@ inline std::string getCommandName(command_n a){
 	}
 }
 
-int createGame(session *);
+int createGame(session_t *);
 command_t *parseCMD(std::string&);
-int resolveCmd(session *, std::string&);
+int resolveCmd(session_t *, std::string&);
 
 #endif

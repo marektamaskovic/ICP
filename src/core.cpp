@@ -3,6 +3,37 @@
 
 #include "core.h"
 
+int session_t::isSpace(void){
+	for(int i = 0; i < 4; i++)
+		if(this->openSlot[i] == false) return i;
+	return -1;
+}
+
+int session_t::addGame(class Game *g){
+	int pos;
+	if( (pos = this->isSpace()) > -1 ){
+		this->slot[pos] = g;
+		this->openSlot[pos] = true;
+		std::cout << "Game added to a slot No." << pos << std::endl;
+		return 0;
+	}
+	else{
+		std::cerr << "Error adding a new game to session. No open slot for the game\n";
+		return 1;
+	}
+}
+
+int session_t::removeGame(int pos){
+	if(this->openSlot[pos] == true){
+		this->openSlot[pos] = false;
+		// FIXME only remove game or should I call a destructor???
+		this->slot[pos] = nullptr;
+		return 0;
+	}
+	return 1;
+}
+
+
 command_t* parseCMD(std::string &cmdBuffer){
 
 	command_t *cmd = new command_t;
@@ -101,7 +132,7 @@ command_t* parseCMD(std::string &cmdBuffer){
 	return cmd;
 }
 
-int resolveCmd(session *session, std::string &cmdBuffer){
+int resolveCmd(session_t *session, std::string &cmdBuffer){
 
 	(void) session;
 
@@ -144,7 +175,7 @@ int resolveCmd(session *session, std::string &cmdBuffer){
 	return 0;
 }
 
-int createGame(session *session){
+int createGame(session_t *session){
 	(void) session;
 	std::cout << "createGame" << std::endl;
 	return 0;

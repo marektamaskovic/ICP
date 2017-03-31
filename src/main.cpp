@@ -17,12 +17,9 @@ int main(int argc, char *argv[]){
 	static_cast<void> (argc);
 	static_cast<void> (argv);
 
-	#pragma message "session_t must be reimplemented to a structure!"
-	session currentSession;
-
-	// Game *currentGame = new Game();
-	// delete(currentGame);
-	// currentSession.slot();
+	session_t currentSession;
+	Game *currentGame = new Game();
+	delete(currentGame);
 
 	std::string cmdBuffer = "";
 
