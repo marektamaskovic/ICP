@@ -14,13 +14,14 @@ extern int position[];
 
 int main(int argc, char *argv[]){
 
-	(void) argc;
-	(void) argv;
+	static_cast<void> (argc);
+	static_cast<void> (argv);
 
 	#pragma message "session_t must be reimplemented to a structure!"
-	session_t session;
-
-	(void)session;
+	session currentSession;
+	Game *currentGame = new Game();
+	delete(currentGame);
+	// currentSession.slot();
 
 	std::string cmdBuffer = "";
 
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]){
 			break;
 		}
 		else{
-			resolveCmd(session, cmdBuffer);
+			resolveCmd(&currentSession, cmdBuffer);
 		}
 
 		std::cout << ">>> ";

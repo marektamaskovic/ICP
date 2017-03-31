@@ -9,10 +9,15 @@ BIN=hra2017 hra2017-cli
 GREEN=\033[1;32m
 RED=\033[1;31m
 NC=\033[0m
+YELLOW=\033[0;33m
 
 .PHONY: hra2017 hra2017-cli all clean
 
 all: hra2017 hra2017-cli
+
+core.o: core.h core.cpp
+	@echo -e "$(YELLOW)=== BUILDING OBJ $(NC)"
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c core.cpp -o $@
 
 hra2017: main.o $(DEPS)
 	@echo -e "$(GREEN)=== Building GUI $(NC)"

@@ -8,16 +8,22 @@
 #ifndef CLASSES
 #define CLASSES
 
-#include <vector>
+#include <vector>		// vector primitives
+#include <algorithm>	// std::shuffle
+#include <ctime>        // std::time
+#include <cstdlib>      // std::rand, std::srand
 #include "core.h"
 
-//enum symbol{A=1,J=11,Q,K};
+enum Symbol{A=1,J=11,Q,K};
+enum Color{heart,spade,diamond,club};
+
+enum Position{flipDeck=1, flopDeck, starterDeck, finalDeck};
+enum Permissions{insert=1, get, insert_get};
 // TODO Doxygen
 
 class Card;
 class Game;
 class Deck;
-
 
 typedef struct {
 	Deck *from;
@@ -27,21 +33,26 @@ typedef struct {
 }Move;
 
 class Card final{
-	enum Color{heart,spade,diamond,club};
 public:
+	bool operator==(const Card&);
 	int number;
 	Color color;
 	bool visible;
 	Card *successor;
 
+	Card();
 	Card(int ,Color);
-	int changeVisibility(void);
+	void printCard();
+	void changeVisibility();
 };
+
+// random generator function:
+static inline int myrandom (int i) { return std::rand()%i;}
 
 class Game {
 public:
 	std::vector<Move> history [5];
-	std::vector<Card> mainDeck [52];
+	std::vector<Card> mainDeck;
 	int m = 0;
 	Game();
 	~Game();
@@ -56,24 +67,25 @@ private:
 	int position = 0;
 };
 
-class Deck final: public Game{
+class Deck final{
 private:
-	enum Position{flipDeck=1, flopDeck, starterDeck, finalDeck};
-	enum Permissions{insert=1, get, insert_get};
 	int checkValidity(Deck *);
 public:
 	std::vector<Card> cards;
 	Position position;
 	Permissions permissions;
 
+	Deck();
 	Deck(Permissions ,Position );
+	Deck(const Deck&);
 	~Deck();
 	/* deck to deck change, vect cards, position, checkValidity() */
-	int insertCards(Card *);
+	int insertCards(Card &);
 	/* using successor of Cards (Card::successor) */
 	std::vector<Card> getCards(Card *);
 	/* decorator fnc */
 	Card& getLastCard();
+	void printDeck();
 	Move* hint(Deck *);
 };
 

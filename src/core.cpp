@@ -101,7 +101,7 @@ command_t* parseCMD(std::string &cmdBuffer){
 	return cmd;
 }
 
-int resolveCmd(session_t session, std::string &cmdBuffer){
+int resolveCmd(session *session, std::string &cmdBuffer){
 
 	(void) session;
 
@@ -144,7 +144,7 @@ int resolveCmd(session_t session, std::string &cmdBuffer){
 	return 0;
 }
 
-int createGame(session_t session){
+int createGame(session *session){
 	(void) session;
 	std::cout << "createGame" << std::endl;
 	return 0;

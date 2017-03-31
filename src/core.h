@@ -2,10 +2,14 @@
 #define CORE
 
 #include <string>
-
+#include <iostream>
 #include "classes.h"
 
-typedef class Game* session_t[4];
+typedef struct session_t{
+	class Game* slot[4];
+	bool Bool[4];
+}session;
+
 /*
  *  TODO
  *	should be struct with flag for each gameslot.
@@ -83,8 +87,8 @@ inline std::string getCommandName(command_n a){
 	}
 }
 
-int createGame(session_t);
+int createGame(session *);
 command_t *parseCMD(std::string&);
-int resolveCmd(session_t, std::string&);
+int resolveCmd(session *, std::string&);
 
 #endif
