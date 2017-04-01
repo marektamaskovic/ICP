@@ -8,16 +8,22 @@
 
 #include "core.h"
 #include "classes.h"
+#include "json.hpp"
 // #include <ncurses.h> // Link \w -lncurses
 
+/*
+ *  Used JSON library:
+ *  https://github.com/nlohmann/json#license
+ */
+
 extern int position[];
+session_t currentSession;
 
 int main(int argc, char *argv[]){
 
 	static_cast<void> (argc);
 	static_cast<void> (argv);
 
-	session_t currentSession;
 	Game *currentGame = new Game();
 	delete(currentGame);
 

@@ -38,10 +38,11 @@ public:
 	int number;
 	Color color;
 	bool visible;
-	Card *successor;
+	int deck = 0;
+	int deckPos = 0;
 
 	Card();
-	Card(int ,Color);
+	Card(int ,Color, int, int);
 	void printCard();
 	void changeVisibility();
 };
@@ -51,7 +52,7 @@ static inline int myrandom (int i) { return std::rand()%i;}
 
 class Game {
 public:
-	std::vector<Move> history [5];
+	std::vector<Move> history;
 	std::vector<Card> mainDeck;
 	int m = 0;
 	Game();
@@ -59,6 +60,7 @@ public:
 	/* FILE */
 	int save();
 	int load();
+	// void showGame(void);
 	static inline int numberOfGames(){ return current_count; }
 	static int current_count;
 
@@ -78,14 +80,13 @@ public:
 	Deck();
 	Deck(Permissions ,Position );
 	Deck(const Deck&);
-	~Deck();
 	/* deck to deck change, vect cards, position, checkValidity() */
-	int insertCards(Card &);
+	// int insertCards(Card &);
 	int swapCards(Deck *);
 	/* using successor of Cards (Card::successor) */
 	std::vector<Card> getCards(Card *);
 	/* decorator fnc */
-	Card& getLastCard();
+	inline Card& getLastCard();
 	void printDeck();
 	Move* hint(Deck *);
 };

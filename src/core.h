@@ -6,8 +6,12 @@
 #include "classes.h"
 
 typedef struct{
+	// public attributes
 	class Game* slot[4];
 	bool openSlot[4] = {false,};
+	int currentGame = -1; // TODO can we choose a better name?
+
+	// public methods
 	int isSpace(void); // return position of first open slot or -1 when error
 	int addGame(class Game*);
 	int removeGame(int noSlot);
@@ -15,21 +19,20 @@ typedef struct{
 }session_t;
 
 typedef enum{
-	noCMD = -1,
-	createG,
-	switchG,
-	quitG,
-	save,
-	load,
-	show,
-	quit,
-	popQueueDeck,
-	moveCard,
-	moveDeck
+	no_CMD = -1,
+	createG_CMD,
+	switchG_CMD,
+	quitG_CMD,
+	save_CMD,
+	load_CMD,
+	show_CMD,
+	quit_CMD,
+	popQueueDeck_CMD,
+	moveCard_CMD
 } command_n;
 
 typedef struct{
-	command_n type = noCMD;
+	command_n type = no_CMD;
 	std::vector<std::string> args {""};
 } command_t;
 
@@ -48,38 +51,35 @@ inline int getPosition(void){
 
 inline std::string getCommandName(command_n a){
 	switch(a){
-		case(noCMD):
+		case(no_CMD):
 			return "noCMD";
 			break;
-		case(createG):
+		case(createG_CMD):
 			return "createGame";
 			break;
-		case(switchG):
+		case(switchG_CMD):
 			return "switchGame";
 			break;
-		case(quitG):
+		case(quitG_CMD):
 			return "quitGame";
 			break;
-		case(save):
+		case(save_CMD):
 			return "save";
 			break;
-		case(load):
+		case(load_CMD):
 			return "load";
 			break;
-		case(show):
+		case(show_CMD):
 			return "show";
 			break;
-		case(quit):
+		case(quit_CMD):
 			return "quit";
 			break;
-		case(popQueueDeck):
+		case(popQueueDeck_CMD):
 			return "popQueueDeck";
 			break;
-		case(moveCard):
+		case(moveCard_CMD):
 			return "moveCard";
-			break;
-		case(moveDeck):
-			return "moveDeck";
 			break;
 		default:
 			return "";

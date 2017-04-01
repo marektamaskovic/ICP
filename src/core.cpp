@@ -2,6 +2,18 @@
 #include <regex>
 
 #include "core.h"
+#include "color.h"
+
+extern session_t currentSession;
+
+#define searchWRegex(rn, r, e) do{														\
+									std::regex rn ##_regex(r, std::regex::grep);					\
+									if(std::regex_match(cmdBuffer, rn ##_regex) > 0){	\
+										cmd->type = e;									\
+										return cmd;										\
+									}													\
+								}while(0)												\
+
 
 int session_t::isSpace(void){
 	for(int i = 0; i < 4; i++)
@@ -15,11 +27,11 @@ int session_t::addGame(class Game *g){
 		this->slot[pos] = g;
 		this->openSlot[pos] = true;
 		std::cout << "Game added to a slot No." << pos << std::endl;
-		return 0;
+		return pos;
 	}
 	else{
 		std::cerr << "Error adding a new game to session. No open slot for the game\n";
-		return 1;
+		return -1;
 	}
 }
 
@@ -66,68 +78,28 @@ command_t* parseCMD(std::string &cmdBuffer){
 		}
 
 	}
+	std::regex search_regex;
 
-	std::regex show_regex("show([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, show_regex) > 0){
-		cmd->type = show;
-		return cmd;
-	}
+	searchWRegex(show,"show([A-z,\\ ]*)", show_CMD);
+	searchWRegex(moveC,"moveC([A-z,\\ ]*)", moveCard_CMD);
+	searchWRegex(popQD,"popQueueDeck([A-z,\\ ]*)",popQueueDeck_CMD);
+	searchWRegex(switchG,"switchGame([A-z,\\ ]*)", switchG_CMD);
+	searchWRegex(save,"save([A-z,\\ ]*)", save_CMD);
+	searchWRegex(load,"load([A-z,\\ ]*)", load_CMD);
+	searchWRegex(createGame,"createGame([A-z,\\ ]*)", createG_CMD);
+	searchWRegex(quit,"quit([A-z,\\ ]*)", quit_CMD);
+	searchWRegex(quitGame,"quitGame([A-z,\\ ]*)", quitG_CMD);
 
-	std::regex moveC_regex("moveCard([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, moveC_regex) > 0){
-		cmd->type = moveCard;
-		return cmd;
-	}
 
-	std::regex popQD_regex("popQueueDeck([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, popQD_regex) > 0){
-		cmd->type = popQueueDeck;
-		return cmd;
-	}
+	// This part of code is used only as reference for macro debugging!
 
-	std::regex moveD_regex("moveDeck([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, moveD_regex) > 0){
-		cmd->type = moveDeck;
-		return cmd;
-	}
+	// std::regex show_regex("show([A-z,\\ ]*)", std::regex::grep);
+	// if(std::regex_match(cmdBuffer, show_regex) > 0){
+	// 	cmd->type = show_CMD;
+	// 	return cmd;
+	// }
 
-	std::regex switchG_regex("switchGame([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, switchG_regex) > 0){
-		cmd->type = switchG;
-		return cmd;
-	}
-
-	std::regex save_regex("save([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, save_regex) > 0){
-		cmd->type = save;
-		return cmd;
-	}
-
-	std::regex load_regex("load([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, load_regex) > 0){
-		cmd->type = load;
-		return cmd;
-	}
-
-	std::regex createGame_regex("createGame([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, createGame_regex) > 0){
-		cmd->type = createG;
-		return cmd;
-	}
-
-	std::regex quitG_regex("quitGame([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, quitG_regex) > 0){
-		cmd->type = quitG;
-		return cmd;
-	}
-
-	std::regex quit_regex("quit([A-z,\\ ]*)", std::regex::grep);
-	if(std::regex_match(cmdBuffer, quit_regex) > 0){
-		cmd->type = quit;
-		return cmd;
-	}
-
-	cmd->type = noCMD;
+	cmd->type = no_CMD;
 
 	return cmd;
 }
@@ -144,26 +116,24 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			  << std::endl;
 
 	switch(cmd->type){
-		case(createG):
+		case(createG_CMD):
 			createGame(session);
 			break;
-		case(show):
+		case(show_CMD):
 			break;
-		case(switchG):
+		case(switchG_CMD):
 			break;
-		case(quitG):
+		case(quitG_CMD):
 			break;
-		case(save):
+		case(save_CMD):
 			break;
-		case(load):
+		case(load_CMD):
 			break;
-		case(quit):
+		case(quit_CMD):
 			break;
-		case(popQueueDeck):
+		case(popQueueDeck_CMD):
 			break;
-		case(moveCard):
-			break;
-		case(moveDeck):
+		case(moveCard_CMD):
 			break;
 		default:
 			std::cout << "Command '" << cmdBuffer << "' is not valid!\n";
@@ -176,7 +146,16 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 }
 
 int createGame(session_t *session){
-	(void) session;
-	std::cout << "createGame" << std::endl;
+	Game* newGame = new Game();
+	int pos;
+	if( (pos = session->addGame(newGame)) < 0){
+		return -1;
+	}
+	std::cout << "createGame"
+			  << std::endl
+			  << "Game created and added to slot:"
+			  << pos
+			  << "!."
+			  << std::endl;
 	return 0;
 }

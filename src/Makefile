@@ -8,8 +8,8 @@ BIN=hra2017 hra2017-cli
 #Colors
 GREEN=\033[1;32m
 RED=\033[1;31m
+YELLOW=\033[1;33m
 NC=\033[0m
-YELLOW=\033[0;33m
 
 .PHONY: hra2017 hra2017-cli all clean
 

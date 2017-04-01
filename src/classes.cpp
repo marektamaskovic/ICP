@@ -1,29 +1,34 @@
 #include "classes.h"
 #include "core.h"
+#include "color.h"
+
+extern session_t currentSession;
 
 Card::Card(): 	number(0),
 				color(heart),
 				visible(false),
-				successor(nullptr){}
+				deck(0),
+				deckPos(0){}
 
-Card::Card(int num, Color clr): number(num),
-								color(clr),
-								visible(true),
-								successor(nullptr){}
+Card::Card(int num, Color clr, int d, int dPos): 	number(num),
+													color(clr),
+													visible(true),
+													deck(d),
+													deckPos(dPos){}
 
 void Card::printCard(){
 	switch(this->color){
 	case 0:
-		std::cout << this->number << "H" << "\n";
+		std::cout << BOLDRED << this->number << "H" << WHITE << ", ";
 		break;
 	case 1:
-		std::cout << this->number << "S" << "\n";
+		std::cout << BOLDBLACK << this->number << "S" << WHITE << ", ";
 		break;
 	case 2:
-		std::cout << this->number << "D" << "\n";
+		std::cout << BOLDRED << this->number << "D" << WHITE << ", ";
 		break;
 	case 3:
-		std::cout << this->number << "C" << "\n";
+		std::cout << BOLDBLACK << this->number << "C" << WHITE << ", ";
 		break;
 	}
 }
@@ -48,25 +53,21 @@ Deck::Deck(const Deck &d): 	cards{d.cards},
 							position{d.position},
 							permissions{d.permissions}{}
 
-Deck::~Deck(){
-	for (unsigned i = 0; i < this->cards.size(); i++){
-		this->cards[i].successor = nullptr;
-	}
-}
+// TODO deleted successor -> refactor!
+// int Deck::insertCards(Card &card){
+// 	//FIXME card iterator or array of cards , inserts only 1 card !!!
+// 	// inserts array of cards or a reference to a card
 
-int Deck::insertCards(Card &card){
-	//FIXME card iterator or array of cards , inserts only 1 card !!!
-	// inserts array of cards or a reference to a card
+// 	Card *tmp = card.successor;
+// 	while (tmp != nullptr){
+// 		tmp = card.successor;
+// 		this->cards.insert(this->cards.begin(), card);
+// 		card = *tmp;
+// 	}
+// 	this->cards.insert(this->cards.begin(), card);
+// 	return 0;
+// }
 
-	Card *tmp = card.successor;
-	while (tmp != nullptr){
-		tmp = card.successor;
-		this->cards.insert(this->cards.begin(), card);
-		card = *tmp;
-	}
-	this->cards.insert(this->cards.begin(), card);
-	return 0;
-}
 
 /* check validity between two decks */
 int Deck::checkValidity(Deck *other){
@@ -81,12 +82,12 @@ int Deck::checkValidity(Deck *other){
 		else if (this->position == finalDeck){
 			if (this->cards.empty() && other->cards.front().number == 1){
 				if (other->cards.front().color == this->cards.front().color){
-					this->insertCards(other->cards.front());
+					// this->insertCards(other->cards.front());
 				}
 			}
-			else if ((other->cards.front().number - 1) == this->cards.front().number)
-				if (other->cards.front().color == this->cards.front().color)
-					this->insertCards(other->cards.front());
+			// else if ((other->cards.front().number - 1) == this->cards.front().number)
+				// if (other->cards.front().color == this->cards.front().color)
+					// this->insertCards(other->cards.front());
 		}
 	}
 	else if (this->permissions == insert && other->permissions == get){
@@ -104,34 +105,36 @@ int Deck::checkValidity(Deck *other){
 }
 
 int Deck::swapCards(Deck *other){
-	if (cardCondition(this, other) == true)
-		other->insertCards( (this->cards.front()) );
+	(void) other;
+	// TODO refecotor!
+	// if (cardCondition(this, other) == true)
+		// other->insertCards( (this->cards.front()) );
 	return 0;
 }
 
-std::vector<Card> Deck::getCards(Card *card){
-	std::vector<Card> cards;
-	if (this->cards.empty() != true){
-		cards.push_back(*card);
-		while(card->successor != nullptr){
-			card=card->successor;
-			cards.push_back(*card);
-		}
-	}
-	return cards;
-}
+// TODO deleted successor -> refactor!
+// std::vector<Card> Deck::getCards(Card *card){
+// 	std::vector<Card> cards;
+// 	if (this->cards.empty() != true){
+// 		cards.push_back(*card);
+// 		while(card->successor != nullptr){
+// 			card=card->successor;
+// 			cards.push_back(*card);
+// 		}
+// 	}
+// 	return cards;
+// }
 
 Card &Deck::getLastCard(){
-	//decorator ?
 	return this->cards.back();
 }
 
 void Deck::printDeck(){
-	std::cout << "Deck {\n";
+	std::cout << "Deck {\n\t";
 	for (unsigned i = 0; i < this->cards.size(); i++){
 		this->cards[i].printCard();
 	}
-	std::cout << "\n}";
+	std::cout << "\b \b\n}";
 }
 
 /* TODO need all decks to match in between them , maybe global Decks ?!?*/
@@ -151,7 +154,7 @@ Move* Deck::hint(Deck *other){
 int Game::current_count = 0;
 
 
-Game::Game() : mainDeck(){
+Game::Game() :  history(), mainDeck(){
 	current_count++;
 	id = current_count;
 	position = getPosition();
@@ -159,7 +162,7 @@ Game::Game() : mainDeck(){
 	for (int i =0; i < 4; i++){
 		clr = static_cast<Color> (i);
 		for (int j = 1; j < 14; j++){
-			Card card (Card(j,clr));
+			Card card (Card(j, clr, 0, 0));
 			mainDeck.push_back(card);
 		}
 	}
@@ -171,7 +174,7 @@ Game::Game() : mainDeck(){
 	Deck flip (insert, flipDeck);
 	Deck flop (get, flopDeck);
 
-	Deck starter[7] = { Deck(insert_get,starterDeck),
+	Deck starter[7] { Deck(insert_get,starterDeck),
 	Deck(insert_get,starterDeck), Deck(insert_get,starterDeck),
 	Deck(insert_get,starterDeck), Deck(insert_get,starterDeck),
 	Deck(insert_get,starterDeck), Deck(insert_get,starterDeck)};
@@ -183,7 +186,7 @@ Game::Game() : mainDeck(){
 
 	for (int j = 0; j < 7; j++){
 		for (int i = 0; i <= j; i++){
-			starter[j].insertCards(mainDeck.front());
+			// starter[j].insertCards(mainDeck.front());
 			// successor fill
 			// filled from 0 to size successored
 			Card tmp = starter[j].cards.back();
@@ -201,7 +204,6 @@ Game::Game() : mainDeck(){
 					starter[j].cards[k].changeVisibility();
 					break;
 				}
-				tmp.successor = &(starter[j].cards[k]);
 				tmp = starter[j].cards[k];
 			}
 			mainDeck.erase(mainDeck.begin());
@@ -215,7 +217,7 @@ Game::Game() : mainDeck(){
 	// shuffle one more time to get more random shuffeled cards
 	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 	for (unsigned i = 0; i < mainDeck.size(); i++){
-		flip.insertCards(mainDeck.front());
+		// flip.insertCards(mainDeck.front());
 		mainDeck.erase(mainDeck.begin());
 	}
 }
@@ -234,6 +236,13 @@ int Game::save(){
 int Game::load(){
 	return 0;
 }
+
+/** void showGame(void){
+		for(auta a: decks){
+			a.printDeck();
+		}
+	}
+**/
 
 bool cardCondition(Deck *first, Deck *second){
 	if (first->cards.front().number ==
