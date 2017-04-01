@@ -19,8 +19,9 @@ int main(int argc, char *argv[]){
 
 	#pragma message "session_t must be reimplemented to a structure!"
 	session currentSession;
-	Game *currentGame = new Game();
-	delete(currentGame);
+
+	// Game *currentGame = new Game();
+	// delete(currentGame);
 	// currentSession.slot();
 
 	std::string cmdBuffer = "";

@@ -57,33 +57,56 @@ Deck::~Deck(){
 int Deck::insertCards(Card &card){
 	//FIXME card iterator or array of cards , inserts only 1 card !!!
 	// inserts array of cards or a reference to a card
-	if (this->cards.empty() == true)
+
+	Card *tmp = card.successor;
+	while (tmp != nullptr){
+		tmp = card.successor;
 		this->cards.insert(this->cards.begin(), card);
-	else
-		this->cards.insert(this->cards.begin(), card);
+		card = *tmp;
+	}
+	this->cards.insert(this->cards.begin(), card);
 	return 0;
 }
 
 /* check validity between two decks */
 int Deck::checkValidity(Deck *other){
-	if (this->permissions == insert){
-		//TODO 3 == club
-		if 	(this->cards.front().number == (other->cards.front().number - 1) &&
-			(this->cards.front().color != other->cards.front().color &&
-			this->cards.front().color == 3) )
-			return 0;
-		// other->insertCards( &(this->cards.front()) );
+	if ( this->permissions == other->permissions ){
+		// moving from this to other, macro used
+		if (this->position == starterDeck){
+			if (cardCondition(this, other) == true){
+				return 0;
+			}
+		}
+		// every final deck has exactly 1 color and numbered from 1 to 13
+		else if (this->position == finalDeck){
+			if (this->cards.empty() && other->cards.front().number == 1){
+				if (other->cards.front().color == this->cards.front().color){
+					this->insertCards(other->cards.front());
+				}
+			}
+			else if ((other->cards.front().number - 1) == this->cards.front().number)
+				if (other->cards.front().color == this->cards.front().color)
+					this->insertCards(other->cards.front());
+		}
 	}
-	else if (this->permissions == get){
-		// just flip to flop deck
-		;
-	}
-	//insert_get
-	else{
-		// 4 final decks
-		;
+	else if (this->permissions == insert && other->permissions == get){
+		/* flip to flop deck */
+		if (this->cards.empty()){
+			for (unsigned i = 0; i < other->cards.size(); i++){
+				this->cards.insert(	other->cards.begin(),other->cards.front());
+				other->cards.erase(other->cards.begin());
+			}
+		}
+		other->cards.insert(other->cards.begin(),this->cards.front());
+		return 0;
 	}
 	return -1;
+}
+
+int Deck::swapCards(Deck *other){
+	if (cardCondition(this, other) == true)
+		other->insertCards( (this->cards.front()) );
+	return 0;
 }
 
 std::vector<Card> Deck::getCards(Card *card){
@@ -111,7 +134,7 @@ void Deck::printDeck(){
 	std::cout << "\n}";
 }
 
-/* TODO need all decks to match in between them */
+/* TODO need all decks to match in between them , maybe global Decks ?!?*/
 Move* Deck::hint(Deck *other){
 	Move *help = nullptr;
 	if (checkValidity(other) == 0){
@@ -145,7 +168,7 @@ Game::Game() : mainDeck(){
 	std::srand ( unsigned ( std::time(0) ) );
 	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 
-	Deck flip (get, flipDeck);
+	Deck flip (insert, flipDeck);
 	Deck flop (get, flopDeck);
 
 	Deck starter[7] = { Deck(insert_get,starterDeck),
@@ -154,6 +177,7 @@ Game::Game() : mainDeck(){
 	Deck(insert_get,starterDeck), Deck(insert_get,starterDeck)};
 
 	// final decks are empty as well as flop deck
+	// FIXME fixne farby dodat aby sa vzdy na tie iste final decky davali tie iste farby
 	Deck final[4] = { Deck(insert_get, finalDeck), Deck(insert_get, finalDeck),
 					Deck(insert_get, finalDeck), Deck(insert_get, finalDeck)};
 
@@ -182,7 +206,7 @@ Game::Game() : mainDeck(){
 			}
 			mainDeck.erase(mainDeck.begin());
 			// DEBUG
-			// starter[j].cards.front().printCard();
+			starter[j].cards.front().printCard();
 			// std::cout << i << " j: " << j << "\n";
 		}
 		// DEBUG
@@ -209,5 +233,25 @@ int Game::save(){
 
 int Game::load(){
 	return 0;
+}
+
+bool cardCondition(Deck *first, Deck *second){
+	if (first->cards.front().number ==
+		(second->cards.front().number - 1)){
+
+		if((first->cards.front().color == club ||
+			first->cards.front().color == heart) &&
+			(second->cards.front().color == spade ||
+			second->cards.front().color == diamond)){
+			return true;
+		}
+		else if ((first->cards.front().color == spade ||
+				first->cards.front().color == diamond) &&
+				(second->cards.front().color == club ||
+				second->cards.front().color == heart)){
+			return true;
+		}
+	}
+	return false;
 }
 

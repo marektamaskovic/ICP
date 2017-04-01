@@ -81,6 +81,7 @@ public:
 	~Deck();
 	/* deck to deck change, vect cards, position, checkValidity() */
 	int insertCards(Card &);
+	int swapCards(Deck *);
 	/* using successor of Cards (Card::successor) */
 	std::vector<Card> getCards(Card *);
 	/* decorator fnc */
@@ -88,7 +89,7 @@ public:
 	void printDeck();
 	Move* hint(Deck *);
 };
-
+bool cardCondition(Deck *, Deck *);
 
 
 #endif
