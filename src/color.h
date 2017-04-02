@@ -1,3 +1,10 @@
+/* xTamas01 and xVasko12 presents the ultimate survival Klondike guide
+ * Project: ICP17, a Klondike (Solitaire) game
+ * FIT VUT Brno
+ * Authors: xtamas01 - Tamaškovič Marek
+ *          xvasko12 - Vaško Martin
+ */
+
 #ifndef COLOR_H
 #define COLOR_H
 

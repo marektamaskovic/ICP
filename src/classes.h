@@ -47,15 +47,16 @@ public:
 	void changeVisibility();
 };
 
-// random generator function:
-static inline int myrandom (int i) { return std::rand()%i;}
-
 class Game {
 public:
 	std::vector<Move> history;
 	std::vector<Card> mainDeck;
+	Deck *decks [7];
+	Deck *finalDecks [4];
 	int m = 0;
 	Game();
+	Game(const Game &G);
+	Game& operator=(const Game &G);
 	~Game();
 	/* FILE */
 	int save();
@@ -78,10 +79,10 @@ public:
 	Permissions permissions;
 
 	Deck();
-	Deck(Permissions ,Position );
+	Deck(Permissions, Position);
 	Deck(const Deck&);
 	/* deck to deck change, vect cards, position, checkValidity() */
-	// int insertCards(Card &);
+	int insertCards(Card &);
 	int swapCards(Deck *);
 	/* using successor of Cards (Card::successor) */
 	std::vector<Card> getCards(Card *);
@@ -90,8 +91,10 @@ public:
 	void printDeck();
 	Move* hint(Deck *);
 };
-bool cardCondition(Deck *, Deck *);
 
+// random generator function:
+static inline int myrandom (int i) { return std::rand()%i;}
+bool cardCondition(Deck *, Deck *);
 
 #endif
 // class Move {

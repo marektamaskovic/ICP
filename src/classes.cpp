@@ -1,3 +1,10 @@
+/* xTamas01 and xVasko12 presents the ultimate survival Klondike guide
+ * Project: ICP17, a Klondike (Solitaire) game
+ * FIT VUT Brno
+ * Authors: xtamas01 - Tamaškovič Marek
+ *          xvasko12 - Vaško Martin
+ */
+
 #include "classes.h"
 #include "core.h"
 #include "color.h"
@@ -53,20 +60,17 @@ Deck::Deck(const Deck &d): 	cards{d.cards},
 							position{d.position},
 							permissions{d.permissions}{}
 
-// TODO deleted successor -> refactor!
-// int Deck::insertCards(Card &card){
-// 	//FIXME card iterator or array of cards , inserts only 1 card !!!
-// 	// inserts array of cards or a reference to a card
+// deleted successor -> refactor!
+int Deck::insertCards(Card &c){
+	// XME card iterator or array of cards , inserts only 1 card !!!
+	// inserts array of cards or a reference to a card
 
-// 	Card *tmp = card.successor;
-// 	while (tmp != nullptr){
-// 		tmp = card.successor;
-// 		this->cards.insert(this->cards.begin(), card);
-// 		card = *tmp;
-// 	}
-// 	this->cards.insert(this->cards.begin(), card);
-// 	return 0;
-// }
+	// for(auto elem: cards){
+	this->cards.push_back(c);
+	// }
+
+	return 0;
+}
 
 
 /* check validity between two decks */
@@ -106,13 +110,13 @@ int Deck::checkValidity(Deck *other){
 
 int Deck::swapCards(Deck *other){
 	(void) other;
-	// TODO refecotor!
+	// TDO refecotor!
 	// if (cardCondition(this, other) == true)
 		// other->insertCards( (this->cards.front()) );
 	return 0;
 }
 
-// TODO deleted successor -> refactor!
+// TOO deleted successor -> refactor!
 // std::vector<Card> Deck::getCards(Card *card){
 // 	std::vector<Card> cards;
 // 	if (this->cards.empty() != true){
@@ -137,24 +141,62 @@ void Deck::printDeck(){
 	std::cout << "\b \b\n}";
 }
 
-/* TODO need all decks to match in between them , maybe global Decks ?!?*/
+/* TOO need all decks to match in between them , maybe global Decks ?!?*/
 Move* Deck::hint(Deck *other){
-	Move *help = nullptr;
-	if (checkValidity(other) == 0){
-		help->from = this;
-		help->to = other;
-		help->card = this->cards.front();
-		unsigned i = 0;
-		while (i < this->cards.size()){ i++; }
-		help->numberOfCards = i;
+	if(other != nullptr){
+		Move *help = nullptr;
+		if (checkValidity(other) == 0){
+			help->from = this;
+			help->to = other;
+			help->card = this->cards.front();
+			unsigned i = 0;
+			while (i < this->cards.size()){ i++; }
+			help->numberOfCards = i;
+		}
+		return help;
 	}
-	return help;
+	else{
+		return nullptr;
+	}
 }
 
 int Game::current_count = 0;
 
+Game::Game(const Game &G) : history(), mainDeck(), decks(), finalDecks(){
+	for(int i = 0; i < 7; i++){
+		decks[i] = G.decks[i];
+	}
 
-Game::Game() :  history(), mainDeck(){
+	for(int i = 0; i < 4; i++){
+		finalDecks[i] = G.finalDecks[i];
+	}
+}
+
+Game& Game::operator=(const Game &G){
+
+	if (this != &G) { // self-assignment check expected
+
+
+		std::copy(G.history.begin(), G.history.end(),
+              std::back_inserter(this->history));
+
+		std::copy(G.mainDeck.begin(), G.mainDeck.end(),
+              std::back_inserter(this->mainDeck));
+
+		for(int i = 0; i < 7; i++){
+			this->decks[i] = G.decks[i];
+		}
+
+		for(int i = 0; i < 4; i++){
+			this->finalDecks[i] = G.finalDecks[i];
+		}
+    }
+    return *this;
+
+
+}
+
+Game::Game() :  history(), mainDeck(), decks(), finalDecks(){
 	current_count++;
 	id = current_count;
 	position = getPosition();
@@ -174,56 +216,39 @@ Game::Game() :  history(), mainDeck(){
 	Deck flip (insert, flipDeck);
 	Deck flop (get, flopDeck);
 
-	Deck starter[7] { Deck(insert_get,starterDeck),
-	Deck(insert_get,starterDeck), Deck(insert_get,starterDeck),
-	Deck(insert_get,starterDeck), Deck(insert_get,starterDeck),
-	Deck(insert_get,starterDeck), Deck(insert_get,starterDeck)};
-
-	// final decks are empty as well as flop deck
-	// FIXME fixne farby dodat aby sa vzdy na tie iste final decky davali tie iste farby
-	Deck final[4] = { Deck(insert_get, finalDeck), Deck(insert_get, finalDeck),
-					Deck(insert_get, finalDeck), Deck(insert_get, finalDeck)};
-
-	for (int j = 0; j < 7; j++){
-		for (int i = 0; i <= j; i++){
-			// starter[j].insertCards(mainDeck.front());
-			// successor fill
-			// filled from 0 to size successored
-			Card tmp = starter[j].cards.back();
-			for (unsigned k = 0 ; k < starter[j].cards.size(); k++){
-				// DEBUG
-				// std::cout << "tmp is : ";
-				// tmp.printCard();
-				// std::cout << " *it is : ";
-				// starter[j].cards[k].printCard();
-				// std::cout << "\n";
-
-				// same card
-				if (tmp == starter[j].cards[k]){
-					tmp.printCard();
-					starter[j].cards[k].changeVisibility();
-					break;
-				}
-				tmp = starter[j].cards[k];
-			}
-			mainDeck.erase(mainDeck.begin());
-			// DEBUG
-			starter[j].cards.front().printCard();
-			// std::cout << i << " j: " << j << "\n";
-		}
-		// DEBUG
-		// std::cout << "deck number: " << j << "\n";
+	for(int i = 0; i < 7; i++){
+		decks[i] = new Deck(insert_get,starterDeck);
 	}
+
+	for(int i = 0; i < 4; i++){
+		finalDecks[i] = new Deck(insert_get,starterDeck);
+	}
+
 	// shuffle one more time to get more random shuffeled cards
 	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 	for (unsigned i = 0; i < mainDeck.size(); i++){
 		// flip.insertCards(mainDeck.front());
 		mainDeck.erase(mainDeck.begin());
 	}
+
+	for (int j = 0; j < 7; j++){
+		for (int i = 0; i <= j; i++){
+			decks[i]->insertCards(mainDeck.back());
+			mainDeck.pop_back();
+		}
+	}
 }
 
 Game::~Game(){
 	current_count--;
+
+	for(int i = 0; i < 7; i++){
+		delete(this->decks[i]);
+	}
+
+	for(int i = 0; i < 4; i++){
+		delete(this->finalDecks[i]);
+	}
 }
 
 /* TODO add JSON library, convert - history deck id position - into json saved

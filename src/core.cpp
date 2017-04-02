@@ -1,3 +1,11 @@
+/* xTamas01 and xVasko12 presents the ultimate survival Klondike guide
+ * Project: ICP17, a Klondike (Solitaire) game
+ * FIT VUT Brno
+ * Authors: xtamas01 - Tamaškovič Marek
+ *          xvasko12 - Vaško Martin
+ */
+
+
 #include <iostream>
 #include <regex>
 
@@ -130,6 +138,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 		case(load_CMD):
 			break;
 		case(quit_CMD):
+			exit(0);
 			break;
 		case(popQueueDeck_CMD):
 			break;
