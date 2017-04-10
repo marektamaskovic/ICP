@@ -31,8 +31,8 @@ int main(int argc, char *argv[]){
 	static_cast<void> (argc);
 	static_cast<void> (argv);
 
-	Game *currentGame = new Game();
-	delete(currentGame);
+	// Game *currentGame = new Game();
+	// delete(currentGame);
 
 	std::string cmdBuffer = "";
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
 
 		if(cmdBuffer == ""){
 			std::cout << std::endl;
-			break;
+			// break;
 		}
 
 		if(cmdBuffer == "exit()" || cmdBuffer == "exit"){

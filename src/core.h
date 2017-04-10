@@ -58,38 +58,38 @@ inline int getPosition(void){
 
 inline std::string getCommandName(command_n a){
 	switch(a){
-		case(no_CMD):
-			return "noCMD";
-			break;
-		case(createG_CMD):
-			return "createGame";
-			break;
-		case(switchG_CMD):
-			return "switchGame";
-			break;
-		case(quitG_CMD):
-			return "quitGame";
-			break;
-		case(save_CMD):
-			return "save";
-			break;
-		case(load_CMD):
-			return "load";
-			break;
-		case(show_CMD):
-			return "show";
-			break;
-		case(quit_CMD):
-			return "quit";
-			break;
-		case(popQueueDeck_CMD):
-			return "popQueueDeck";
-			break;
-		case(moveCard_CMD):
-			return "moveCard";
-			break;
-		default:
-			return "";
+	case(no_CMD):
+		return "noCMD";
+		break;
+	case(createG_CMD):
+		return "createGame";
+		break;
+	case(switchG_CMD):
+		return "switchGame";
+		break;
+	case(quitG_CMD):
+		return "quitGame";
+		break;
+	case(save_CMD):
+		return "save";
+		break;
+	case(load_CMD):
+		return "load";
+		break;
+	case(show_CMD):
+		return "show";
+		break;
+	case(quit_CMD):
+		return "quit";
+		break;
+	case(popQueueDeck_CMD):
+		return "popQueueDeck";
+		break;
+	case(moveCard_CMD):
+		return "moveCard";
+		break;
+	default:
+		return "";
 	}
 }
 

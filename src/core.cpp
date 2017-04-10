@@ -14,13 +14,14 @@
 
 extern session_t currentSession;
 
-#define searchWRegex(rn, r, e) do{														\
-									std::regex rn ##_regex(r, std::regex::grep);					\
-									if(std::regex_match(cmdBuffer, rn ##_regex) > 0){	\
-										cmd->type = e;									\
-										return cmd;										\
-									}													\
-								}while(0)												\
+#define searchWRegex(rn, r, e)								\
+do{															\
+	std::regex rn ##_regex(r, std::regex::grep);			\
+	if(std::regex_match(cmdBuffer, rn ##_regex) > 0){		\
+		cmd->type = e;										\
+		return cmd;											\
+	}														\
+}while(0)													\
 
 
 int session_t::isSpace(void){
@@ -90,7 +91,7 @@ command_t* parseCMD(std::string &cmdBuffer){
 
 	searchWRegex(show,"show([A-z,\\ ]*)", show_CMD);
 	searchWRegex(moveC,"moveC([A-z,\\ ]*)", moveCard_CMD);
-	searchWRegex(popQD,"popQueueDeck([A-z,\\ ]*)",popQueueDeck_CMD);
+	searchWRegex(popQD,"popQD([A-z,\\ ]*)",popQueueDeck_CMD);
 	searchWRegex(switchG,"switchGame([A-z,\\ ]*)", switchG_CMD);
 	searchWRegex(save,"save([A-z,\\ ]*)", save_CMD);
 	searchWRegex(load,"load([A-z,\\ ]*)", load_CMD);
@@ -123,24 +124,52 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			  << "'"
 			  << std::endl;
 
+	int num;
+	// Deck *flip = session->slot[session->currentGame]->flip;
+	// Deck *flop = session->slot[session->currentGame]->flop;
+	// Move moveTmp {flip, flop, flop->cards.back(), 1};
 	switch(cmd->type){
 		case(createG_CMD):
 			createGame(session);
 			break;
 		case(show_CMD):
+			// DEBUG
+			// std::cout << "Current Game is: " << session->currentGame << "\n";
+			session->slot[session->currentGame]->showGame();
 			break;
 		case(switchG_CMD):
+			num = std::stoi(cmd->args.front());
+			if (session->openSlot[num] != false)
+				session->currentGame = num;
 			break;
 		case(quitG_CMD):
+			session->openSlot[session->currentGame] = false;
+			delete session->slot[session->currentGame];
+			// TODO prvy volny slot , ak nie je volny vratis sa spat
 			break;
 		case(save_CMD):
 			break;
 		case(load_CMD):
 			break;
 		case(quit_CMD):
+			for(int i = 0; i < 4; ++i){
+				if (session->openSlot[i] == true)
+					delete session->slot[i];
+			}
 			exit(0);
 			break;
 		case(popQueueDeck_CMD):
+			session->slot[session->currentGame]->flip->dequeue(session->slot
+												[session->currentGame]->flop);
+
+			// flop->printDeck();
+			// flop->cards.back().printCard();
+			// std::cout << "\n\n";
+
+			// session->slot[session->currentGame]->
+			// 		history.push_back({flip, flop, flop->cards.back(), 1});
+
+			printMove(session->slot[session->currentGame]->history);
 			break;
 		case(moveCard_CMD):
 			break;
@@ -160,6 +189,7 @@ int createGame(session_t *session){
 	if( (pos = session->addGame(newGame)) < 0){
 		return -1;
 	}
+	session->currentGame = pos;
 	std::cout << "createGame"
 			  << std::endl
 			  << "Game created and added to slot:"

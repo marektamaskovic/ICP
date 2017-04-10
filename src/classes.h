@@ -39,7 +39,7 @@ public:
 	Color color;
 	bool visible;
 	int deck = 0;
-	int deckPos = 0;
+	unsigned deckPos = 0;
 
 	Card();
 	Card(int ,Color, int, int);
@@ -48,11 +48,14 @@ public:
 };
 
 class Game {
+// friend class Deck;
 public:
 	std::vector<Move> history;
 	std::vector<Card> mainDeck;
 	Deck *decks [7];
 	Deck *finalDecks [4];
+	Deck *flip;
+	Deck *flop;
 	int m = 0;
 	Game();
 	Game(const Game &G);
@@ -61,10 +64,9 @@ public:
 	/* FILE */
 	int save();
 	int load();
-	// void showGame(void);
+	void showGame();
 	static inline int numberOfGames(){ return current_count; }
 	static int current_count;
-
 private:
 	int id = 0;
 	int position = 0;
@@ -72,7 +74,7 @@ private:
 
 class Deck final{
 private:
-	int checkValidity(Deck *);
+	int checkValidity(Card &card);
 public:
 	std::vector<Card> cards;
 	Position position;
@@ -81,20 +83,20 @@ public:
 	Deck();
 	Deck(Permissions, Position);
 	Deck(const Deck&);
+	inline void insertCard(Card &);
 	/* deck to deck change, vect cards, position, checkValidity() */
-	int insertCards(Card &);
-	int swapCards(Deck *);
-	/* using successor of Cards (Card::successor) */
-	std::vector<Card> getCards(Card *);
+	int moveCards(Deck *, Card &);
+	Move* hint(Deck *, Card &);
 	/* decorator fnc */
 	inline Card& getLastCard();
 	void printDeck();
-	Move* hint(Deck *);
+	int dequeue(Deck *);
 };
 
 // random generator function:
 static inline int myrandom (int i) { return std::rand()%i;}
-bool cardCondition(Deck *, Deck *);
+bool cardCondition(Deck *, Card &);
+void printMove(std::vector<Move>);
 
 #endif
 // class Move {

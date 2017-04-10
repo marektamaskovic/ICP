@@ -28,6 +28,8 @@ all: hra2017 hra2017-cli
 core.o: core.h core.cpp
 	@echo -e "$(YELLOW)=== BUILDING OBJ $(NC)"
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c core.cpp -o $@
+classes.o: classes.h classes.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c classes.cpp -o $@
 
 hra2017: main.o $(DEPS)
 	@echo -e "$(GREEN)=== Building GUI $(NC)"
