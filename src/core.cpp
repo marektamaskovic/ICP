@@ -89,15 +89,15 @@ command_t* parseCMD(std::string &cmdBuffer){
 	}
 	std::regex search_regex;
 
-	searchWRegex(show,"show([A-z,\\ ]*)", show_CMD);
-	searchWRegex(moveC,"moveC([A-z,\\ ]*)", moveCard_CMD);
-	searchWRegex(popQD,"popQD([A-z,\\ ]*)",popQueueDeck_CMD);
-	searchWRegex(switchG,"switchGame([A-z,\\ ]*)", switchG_CMD);
-	searchWRegex(save,"save([A-z,\\ ]*)", save_CMD);
-	searchWRegex(load,"load([A-z,\\ ]*)", load_CMD);
-	searchWRegex(createGame,"createGame([A-z,\\ ]*)", createG_CMD);
-	searchWRegex(quit,"quit([A-z,\\ ]*)", quit_CMD);
-	searchWRegex(quitGame,"quitGame([A-z,\\ ]*)", quitG_CMD);
+	searchWRegex(show,"show([A-z, 0-9,\\ ]*)", show_CMD);
+	searchWRegex(moveC,"moveC([A-z, 0-9,\\ ]*)", moveCard_CMD);
+	searchWRegex(popQD,"popQD([A-z,0-9,\\ ]*)",popQueueDeck_CMD);
+	searchWRegex(switchG,"switchGame([A-z,0-9,\\ ]*)", switchG_CMD);
+	searchWRegex(save,"save([A-z,0-9,\\ ]*)", save_CMD);
+	searchWRegex(load,"load([A-z,0-9,\\ ]*)", load_CMD);
+	searchWRegex(createGame,"createGame([A-z,0-9,\\ ]*)", createG_CMD);
+	searchWRegex(quit,"quit([A-z,0-9,\\ ]*)", quit_CMD);
+	searchWRegex(quitGame,"quitGame([A-z,0-9,\\ ]*)", quitG_CMD);
 
 
 	// This part of code is used only as reference for macro debugging!
