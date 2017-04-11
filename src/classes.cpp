@@ -33,6 +33,7 @@ void Card::printCard(){
 	// DEBUG
 	// std::cout << this->deck << ": ";
 	// std::cout << this->deckPos << ": ";
+	// TODO Fixme enum; {using switch}
 	if (this->visible == true){
 		switch(this->color){
 		case 0:
@@ -80,6 +81,7 @@ void Deck::insertCard(Card &card){
 /* check validity between two decks */
 /* FIXME we need other deck what if not enough permissions? */
 int Deck::checkValidity(Card &card){
+	// TODO K on empty deck!
 	if ( this->permissions == insert_get && card.visible == true){
 		// moving card to this , function to compare used
 		if (this->position == starterDeck){
@@ -165,6 +167,7 @@ int Deck::dequeue(Deck *other){
 
 void Deck::printDeck(){
 	if (this->permissions == insert || this->permissions == get){
+		// TODO print deck no.
 		std::cout << "Deck {\t";
 		// for (unsigned i = 0; i < this->cards.size(); i++)
 		// 	this->cards[i].printCard();
@@ -388,6 +391,7 @@ void clearHistory(std::vector<Move> mv){
 
 Card & getCard(std::string str){
 	int num = 0;
+	// FIXME parse card name by sscanf!
 	std::cout << "GetCard" << str[0] << "\n";
 	if (str.length() == 2){
 		if (isdigit(str[0])){
@@ -404,4 +408,49 @@ Card & getCard(std::string str){
 		currentSession.slot[curr]->decks[i]->printDeck();
 	}
 	return currentSession.slot[curr]->decks[0]->cards.front();
+}
+
+
+switch(a1){
+	case(0):
+		type = Final;
+		index = a1;
+		break;
+	case(4):
+		type = FINAL;
+		index = a1;
+		break;
+	case(4):
+		type = FINAL;
+		index = a1;
+		break;
+	case(4):
+		type = FINAL;
+		index = a1;
+		break;
+	case(4):
+		type = DECKS;
+		index = a1 - 4;
+		break;
+	case(4):
+		type = DECKS;
+		index = a1 - 4;
+		break;
+	case(4):
+		type = DECKS;
+		index = a1 - 4;
+		break;
+	case(4):
+		type = DECKS;
+		index = a1 - 4;
+		break;
+	case(4):
+		type = FLIP;
+		index = a1 - 10;
+		break;
+	case(4):
+		type = FLOP;
+		index = a1 - 11;
+		break;
+
 }

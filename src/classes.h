@@ -38,7 +38,7 @@ public:
 	int number;
 	Color color;
 	bool visible;
-	int deck = 0;
+	int deck = 0; // FIXME uber tuto premenu
 	unsigned deckPos = 0;
 
 	Card();
@@ -77,10 +77,12 @@ class Deck final{
 private:
 	int checkValidity(Card &card);
 public:
+	int deck = 0;
 	std::vector<Card> cards;
 	Position position;
 	Permissions permissions;
 
+	// TODO check validity of moving vector
 	Deck();
 	Deck(Permissions, Position);
 	Deck(const Deck&);
