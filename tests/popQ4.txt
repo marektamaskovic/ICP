@@ -1,3 +1,4 @@
 createGame()
 popQD()
 show()
+quit()

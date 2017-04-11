@@ -1,0 +1,6 @@
+createGame()
+moveC(1H,2H)
+moveC(1H,6H)
+moveC(H,H)
+show()
+quit()

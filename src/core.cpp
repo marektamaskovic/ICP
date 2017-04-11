@@ -93,6 +93,7 @@ command_t* parseCMD(std::string &cmdBuffer){
 	searchWRegex(moveC,"moveC([A-z,\\ ]*)", moveCard_CMD);
 	searchWRegex(popQD,"popQD([A-z,\\ ]*)",popQueueDeck_CMD);
 	searchWRegex(switchG,"switchGame([A-z,\\ ]*)", switchG_CMD);
+	searchWRegex(undo,"undo([A-z,\\ ]*)", undo_CMD);
 	searchWRegex(save,"save([A-z,\\ ]*)", save_CMD);
 	searchWRegex(load,"load([A-z,\\ ]*)", load_CMD);
 	searchWRegex(createGame,"createGame([A-z,\\ ]*)", createG_CMD);
@@ -128,6 +129,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 	// Deck *flip = session->slot[session->currentGame]->flip;
 	// Deck *flop = session->slot[session->currentGame]->flop;
 	// Move moveTmp {flip, flop, flop->cards.back(), 1};
+	Card c;
 	switch(cmd->type){
 		case(createG_CMD):
 			createGame(session);
@@ -153,25 +155,28 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			break;
 		case(quit_CMD):
 			for(int i = 0; i < 4; ++i){
-				if (session->openSlot[i] == true)
+				if (session->openSlot[i] == true){
+					printMove(session->slot[i]->history);
+					clearHistory(session->slot[session->currentGame]->history);
 					delete session->slot[i];
+				}
 			}
 			exit(0);
 			break;
 		case(popQueueDeck_CMD):
 			session->slot[session->currentGame]->flip->dequeue(session->slot
 												[session->currentGame]->flop);
-
-			// flop->printDeck();
-			// flop->cards.back().printCard();
-			// std::cout << "\n\n";
-
-			// session->slot[session->currentGame]->
-			// 		history.push_back({flip, flop, flop->cards.back(), 1});
-
-			printMove(session->slot[session->currentGame]->history);
 			break;
 		case(moveCard_CMD):
+			if (cmd->args.size() > 1){
+				for (unsigned i = 0; i < cmd->args.size(); ++i)
+					std::cout << cmd->args[i] << "\n";
+				c = getCard(cmd->args[1]);
+				// session->slot[session->currentGame]->args[0].moveCards(c);
+			}
+			break;
+		case(undo_CMD):
+			printMove(session->slot[session->currentGame]->history);
 			break;
 		default:
 			std::cout << "Command '" << cmdBuffer << "' is not valid!\n";

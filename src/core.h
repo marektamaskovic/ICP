@@ -35,7 +35,8 @@ typedef enum{
 	show_CMD,
 	quit_CMD,
 	popQueueDeck_CMD,
-	moveCard_CMD
+	moveCard_CMD,
+	undo_CMD
 } command_n;
 
 typedef struct{
@@ -96,5 +97,6 @@ inline std::string getCommandName(command_n a){
 int createGame(session_t *);
 command_t *parseCMD(std::string&);
 int resolveCmd(session_t *, std::string&);
+
 
 #endif

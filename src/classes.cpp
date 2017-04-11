@@ -23,6 +23,12 @@ Card::Card(int num, Color clr, int d, int dPos): 	number(num),
 													deck(d),
 													deckPos(dPos){}
 
+Card::Card(const Card &c): 	number(c.number),
+							color(c.color),
+							visible(c.visible),
+							deck(c.deck),
+							deckPos(c.deckPos){}
+
 void Card::printCard(){
 	// DEBUG
 	// std::cout << this->deck << ": ";
@@ -102,8 +108,9 @@ int Deck::checkValidity(Card &card){
 	return -1;
 }
 
-int Deck::moveCards(Deck *other, Card &card){
-	(void) other;
+
+/* TODO mov cmd */
+int Deck::moveCards(Card &card){
 	card.printCard();
 	// TDO refecotor!
 	// if (cardCondition(this, other) == true)
@@ -114,33 +121,41 @@ int Deck::moveCards(Deck *other, Card &card){
 Card &Deck::getLastCard(){
 	return this->cards.back();
 }
-
+/* 11 = flop deck
+ * 10 = flip deck
+ * negative for finalDecks?
+ * 0-6 for starterDecks
+ */
 int Deck::dequeue(Deck *other){
 	if (this->permissions == insert && other->permissions == get){
 		/* flip to flop deck */
 		if (this->cards.empty()){
+			Card *c = new Card(other->cards.back());
 			currentSession.slot[currentSession.currentGame]->
-				history.push_back({this, other, other->cards.back(), 1});
+				history.push_back({11, 10, c, 1});
 
 			for (unsigned i = 0; i != other->cards.size();){
 				// Again from start
 				other->cards.front().changeVisibility();
-				this->cards.push_back(std::move(other->cards.front()));
+				this->cards.push_back(other->cards.front());
 				other->cards.erase(other->cards.begin());
+				this->cards.front().deck = 10;
 			}
 
 			return 0;
 		}
 		else{
 
-			other->cards.push_back(std::move(this->cards.front()));
+			other->cards.push_back(this->cards.front());
 			// to flop, change visibility
 			other->cards.back().changeVisibility();
 			this->cards.erase(this->cards.begin());
-			other->cards.back().deck = 11;
+			other->cards.front().deck = 11;
+
+			Card *c = new Card(other->cards.back());
 
 			currentSession.slot[currentSession.currentGame]->
-				history.push_back({this, other, other->cards.back(), 1});
+				history.push_back({10, 11, c, 1});
 
 			return 0;
 		}
@@ -151,10 +166,10 @@ int Deck::dequeue(Deck *other){
 void Deck::printDeck(){
 	if (this->permissions == insert || this->permissions == get){
 		std::cout << "Deck {\t";
-		for (unsigned i = 0; i < this->cards.size(); i++)
-			this->cards[i].printCard();
-		// if (this->cards.size() > 0)
-		// 	this->cards[this->cards.size()-1].printCard();
+		// for (unsigned i = 0; i < this->cards.size(); i++)
+		// 	this->cards[i].printCard();
+		if (this->cards.size() > 0)
+			this->cards[this->cards.size()-1].printCard();
 		std::cout << "\b\b  \b\b\t}\n";
 	}
 	else{
@@ -166,23 +181,25 @@ void Deck::printDeck(){
 	}
 }
 
-/* TODO need all decks to match in between them , maybe global Decks ?!?*/
+/* TODO documentation */
 Move* Deck::hint(Deck *other, Card &card){
-	if(other != nullptr){
-		Move *help = nullptr;
-		if (checkValidity(card) == 0){
-			help->from = this;
-			help->to = other;
-			help->card = this->cards.front();
-			unsigned i = 0;
-			while (i < this->cards.size()){ i++; }
-			help->numberOfCards = i;
-		}
-		return help;
-	}
-	else{
+	// if(other != nullptr){
+	// 	Move *help = nullptr;
+	// 	if (checkValidity(card) == 0){
+	// 		help->from = this;
+	// 		help->to = other;
+	// 		help->card = this->cards.front();
+	// 		unsigned i = 0;
+	// 		while (i < this->cards.size()){ i++; }
+	// 		help->numberOfCards = i;
+	// 	}
+	// 	return help;
+	// }
+	// else{
+	other->printDeck();
+	card.printCard();
 		return nullptr;
-	}
+	// }
 }
 
 int Game::current_count = 0;
@@ -225,7 +242,7 @@ Game& Game::operator=(const Game &G){
 
 
 }
-/* TODO documentation */
+/* TODO documentation , repair shuffle */
 Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
 	current_count++;
 	id = current_count;
@@ -241,7 +258,7 @@ Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
 	/* Game will create all decks at first not filled with cards */
 	//shuffling cards
 	std::srand ( unsigned ( std::time(0) ) );
-	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
+	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 
 	flip = new Deck (insert, flipDeck);
 	flop = new Deck (get, flopDeck);
@@ -255,7 +272,7 @@ Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
 	}
 
 	// shuffle one more time to get more random shuffeled cards
-	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
+	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 	for (int j = 0; j < 7; j++){
 
 		for (int i = 0; i <= j; i++){
@@ -276,7 +293,7 @@ Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
 		this->flip->insertCard(mainDeck.back());
 		mainDeck.erase(mainDeck.end());
 	}
-
+	// TODO clear or leave it?
 	showGame();
 }
 
@@ -304,7 +321,7 @@ int Game::save(){
 int Game::load(){
 	return 0;
 }
-
+/* FIXME maybe better printing skills? :D */
 void Game::showGame(){
 	this->flip->printDeck();
 	this->flop->printDeck();
@@ -338,15 +355,53 @@ bool cardCondition(Deck *first, Card &card){
 
 void printMove(std::vector<Move> mov){
 	std::cout << "Move:\n";
-	// mov.front().from->printDeck();
-	// mov.front().to->printDeck();
-	// std::cout << "number of cards:" << mov.front().numberOfCards << "\n";
 
+	std::string from = "";
+	std::string to = "";
 	for (unsigned i = 0; i < mov.size(); ++i){
-		mov[i].from->printDeck();
-		mov[i].to->printDeck();
-		mov[i].card.printCard();
+		if (mov[i].from == 10)
+			from = "From - Flip deck: ";
+		if (mov[i].to == 10)
+			to = "To - Flip deck: ";
+		if (mov[i].from == 11)
+			from = "From - Flop deck: ";
+		if (mov[i].to == 11)
+			to = "To - Flip deck";
+
+		if (mov[i].from < 7)
+			from = "From - Starter deck: ";
+		if (mov[i].to < 7)
+			to = "To - Starter deck: ";
+		std::cout << from << "\n";
+		std::cout << to << "\n";
+		mov[i].card->printCard();
 		std::cout << "number of cards: " << i << "\n";
 	}
 	std::cout << "End\n";
+}
+
+void clearHistory(std::vector<Move> mv){
+	for(unsigned i = 0; i < mv.size(); ++i){
+		delete mv[i].card;
+	}
+}
+
+Card & getCard(std::string str){
+	int num = 0;
+	std::cout << "GetCard" << str[0] << "\n";
+	if (str.length() == 2){
+		if (isdigit(str[0])){
+			std::cout << "IFF";
+			num = str[0];
+		}
+	}
+	std::cout << "Number of card" << num << "\n";
+	// Card c = Card(std::stoi(str[0]), std::stoi(str[1]), 0, 0);
+	// (void) c;
+	int curr = currentSession.currentGame;
+	for (int i = 0; i < 7; ++i){
+
+		currentSession.slot[curr]->decks[i]->printDeck();
+	}
+	return currentSession.slot[curr]->decks[0]->cards.front();
 }

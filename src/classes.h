@@ -26,9 +26,9 @@ class Game;
 class Deck;
 
 typedef struct {
-	Deck *from;
-	Deck *to;
-	Card &card;
+	int from;
+	int to;
+	Card *card;
 	unsigned numberOfCards; // successor
 }Move;
 
@@ -42,6 +42,7 @@ public:
 	unsigned deckPos = 0;
 
 	Card();
+	Card(const Card &);
 	Card(int ,Color, int, int);
 	void printCard();
 	void changeVisibility();
@@ -85,7 +86,7 @@ public:
 	Deck(const Deck&);
 	inline void insertCard(Card &);
 	/* deck to deck change, vect cards, position, checkValidity() */
-	int moveCards(Deck *, Card &);
+	int moveCards(Card &);
 	Move* hint(Deck *, Card &);
 	/* decorator fnc */
 	inline Card& getLastCard();
@@ -97,6 +98,8 @@ public:
 static inline int myrandom (int i) { return std::rand()%i;}
 bool cardCondition(Deck *, Card &);
 void printMove(std::vector<Move>);
+void clearHistory(std::vector<Move>);
+Card& getCard(std::string);
 
 #endif
 // class Move {
