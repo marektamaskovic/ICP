@@ -100,7 +100,6 @@ command_t* parseCMD(std::string &cmdBuffer){
 	searchWRegex(quit,"quit([A-z,\\ ]*)", quit_CMD);
 	searchWRegex(quitGame,"quitGame([A-z,\\ ]*)", quitG_CMD);
 
-
 	// This part of code is used only as reference for macro debugging!
 
 	// std::regex show_regex("show([A-z,\\ ]*)", std::regex::grep);
