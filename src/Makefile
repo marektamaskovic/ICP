@@ -9,7 +9,7 @@
 ###############################################################################
 
 CXX=g++
-CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++14 -Weffc++ -g3
+CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++11 -Weffc++ -g3
 CXXLIBS=
 LDFLAGS=-L.
 DEPS=core.o classes.o

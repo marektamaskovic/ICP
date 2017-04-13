@@ -14,16 +14,6 @@
 
 extern session_t currentSession;
 
-#define searchWRegex(rn, r, e)								\
-do{															\
-	std::regex rn ##_regex(r, std::regex::grep);			\
-	if(std::regex_match(cmdBuffer, rn ##_regex) > 0){		\
-		cmd->type = e;										\
-		return cmd;											\
-	}														\
-}while(0)													\
-
-
 int session_t::isSpace(void){
 	for(int i = 0; i < 4; i++)
 		if(this->openSlot[i] == false) return i;
@@ -59,57 +49,42 @@ command_t* parseCMD(std::string &cmdBuffer){
 
 	command_t *cmd = new command_t;
 
-	std::string::size_type n,l;
-	std::string arg_buff = "";
+	char* argument = new char[42];
 
-	n = cmdBuffer.find_first_of("(");
-	l = cmdBuffer.find_first_of(")");
-
-	n++;
-
-	if( (n-l) > 1){
-		arg_buff = cmdBuffer.substr(n, l-n);
-
-		std::regex words_regex("[^,\\ ]+");
-		auto words_begin =
-			std::sregex_iterator(arg_buff.begin(), arg_buff.end(), words_regex);
-		auto words_end = std::sregex_iterator();
-
-		std::cout << "Found "
-			  << std::distance(words_begin, words_end)
-			  << " words:\n";
-
-		for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
-			std::smatch match = *i;
-			std::string match_str = match.str();
-			cmd->args.push_back(match_str);
-			std::cout << match_str << '\n';
-		}
-
+	if(cmdBuffer == "show()"){
+		cmd->type = show_CMD;
 	}
-	std::regex search_regex;
+	else if(cmdBuffer == "popQD()"){
+		cmd->type = popQueueDeck_CMD;
+	}
+	else if(cmdBuffer == "undo()"){
+		cmd->type = undo_CMD;
+	}
+	else if(cmdBuffer == "createGame()"){
+		cmd->type = createG_CMD;
+	}
+	else if(cmdBuffer == "quit()"){
+		cmd->type = quit_CMD;
+	}
+	else if(cmdBuffer == "quitGame()"){
+		cmd->type = quitG_CMD;
+	}
+	else if(sscanf(cmdBuffer.c_str(),"switchGame(%s)",argument) != EOF){
+		cmd->args.push_back(argument);
+		cmd->type = switchG_CMD;
+	}
+	else if(sscanf(cmdBuffer.c_str(),"save(%s)",argument) != EOF){
+		cmd->args.push_back(argument);
+		cmd->type = save_CMD;
+	}
+	else if(sscanf(cmdBuffer.c_str(),"load(%s)",argument) != EOF){
+		cmd->args.push_back(argument);
+		cmd->type = load_CMD;
+	}
+	else
+		cmd->type = no_CMD;
 
-	searchWRegex(show,"show([A-z0-9\\ ]*)", show_CMD);
-	searchWRegex(moveC,"moveC([A-z0-9\\ ]*)", moveCard_CMD);
-	searchWRegex(popQD,"popQD([A-z0-9\\ ]*)",popQueueDeck_CMD);
-	searchWRegex(switchG,"switchGame([A-z0-9\\ ]*)", switchG_CMD);
-	searchWRegex(undo,"undo([A-z0-9\\ ]*)", undo_CMD);
-	searchWRegex(save,"save([A-z0-9\\ ]*)", save_CMD);
-	searchWRegex(load,"load([A-z0-9\\ ]*)", load_CMD);
-	searchWRegex(createGame,"createGame([A-z0-9\\ ]*)", createG_CMD);
-	searchWRegex(quit,"quit([A-z0-9\\ ]*)", quit_CMD);
-	searchWRegex(quitGame,"quitGame([A-z0-9\\ ]*)", quitG_CMD);
-
-	// This part of code is used only as reference for macro debugging!
-
-	// std::regex show_regex("show([A-z,\\ ]*)", std::regex::grep);
-	// if(std::regex_match(cmdBuffer, show_regex) > 0){
-	// 	cmd->type = show_CMD;
-	// 	return cmd;
-	// }
-
-	cmd->type = no_CMD;
-
+	delete(argument);
 	return cmd;
 }
 
@@ -160,6 +135,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 					delete session->slot[i];
 				}
 			}
+			delete(cmd);
 			exit(0);
 			break;
 		case(popQueueDeck_CMD):

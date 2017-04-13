@@ -411,46 +411,46 @@ Card & getCard(std::string str){
 }
 
 
-switch(a1){
-	case(0):
-		type = Final;
-		index = a1;
-		break;
-	case(4):
-		type = FINAL;
-		index = a1;
-		break;
-	case(4):
-		type = FINAL;
-		index = a1;
-		break;
-	case(4):
-		type = FINAL;
-		index = a1;
-		break;
-	case(4):
-		type = DECKS;
-		index = a1 - 4;
-		break;
-	case(4):
-		type = DECKS;
-		index = a1 - 4;
-		break;
-	case(4):
-		type = DECKS;
-		index = a1 - 4;
-		break;
-	case(4):
-		type = DECKS;
-		index = a1 - 4;
-		break;
-	case(4):
-		type = FLIP;
-		index = a1 - 10;
-		break;
-	case(4):
-		type = FLOP;
-		index = a1 - 11;
-		break;
+// switch(a1){
+// 	case(0):
+// 		type = Final;
+// 		index = a1;
+// 		break;
+// 	case(4):
+// 		type = FINAL;
+// 		index = a1;
+// 		break;
+// 	case(4):
+// 		type = FINAL;
+// 		index = a1;
+// 		break;
+// 	case(4):
+// 		type = FINAL;
+// 		index = a1;
+// 		break;
+// 	case(4):
+// 		type = DECKS;
+// 		index = a1 - 4;
+// 		break;
+// 	case(4):
+// 		type = DECKS;
+// 		index = a1 - 4;
+// 		break;
+// 	case(4):
+// 		type = DECKS;
+// 		index = a1 - 4;
+// 		break;
+// 	case(4):
+// 		type = DECKS;
+// 		index = a1 - 4;
+// 		break;
+// 	case(4):
+// 		type = FLIP;
+// 		index = a1 - 10;
+// 		break;
+// 	case(4):
+// 		type = FLOP;
+// 		index = a1 - 11;
+// 		break;
 
-}
+// }
