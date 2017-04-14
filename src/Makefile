@@ -39,7 +39,7 @@ hra2017-cli: main.o $(DEPS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< $(DEPS) -o $@
 
 hra2017-cli-tr: CXX=g++-6
-hra2017-cli-tr: hra2017_cli
+hra2017-cli-tr: hra2017-cli
 
 clean:
 	@echo -e "$(RED)cleaning like mexican cleaning lady $(NC)"

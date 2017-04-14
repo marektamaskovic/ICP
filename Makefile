@@ -41,12 +41,12 @@ $(CLI):
 	cp src/$(CLI) ./
 
 travis_compile:
-	@cd src/ && $(MAKE) hra2017_cli-tr
-	cp src/hra2017_cli ./hra2017-cli-tr
+	@cd src/ && $(MAKE) hra2017-cli-tr
+	cp src/hra2017-cli ./hra2017-cli-tr
 
 #FIXME, run CLI or GUI?
 run:
-	./hra2017-cli
+	./hra2017-cli < ./tests/popQ1.txt
 
 doc:
 	cd src/ && doxygen doxyfile
