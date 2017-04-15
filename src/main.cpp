@@ -31,9 +31,6 @@ int main(int argc, char *argv[]){
 	static_cast<void> (argc);
 	static_cast<void> (argv);
 
-	// Game *currentGame = new Game();
-	// delete(currentGame);
-
 	std::string cmdBuffer = "";
 
 	std::cout << ">>> ";

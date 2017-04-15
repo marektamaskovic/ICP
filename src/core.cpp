@@ -90,8 +90,6 @@ command_t* parseCMD(std::string &cmdBuffer){
 
 int resolveCmd(session_t *session, std::string &cmdBuffer){
 
-	(void) session;
-
 	command_t *cmd = parseCMD(cmdBuffer);
 
 	std::cout << "Cmd: '"
@@ -111,7 +109,8 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 		case(show_CMD):
 			// DEBUG
 			// std::cout << "Current Game is: " << session->currentGame << "\n";
-			session->slot[session->currentGame]->showGame();
+			if (session->currentGame != -1)
+				session->slot[session->currentGame]->showGame();
 			break;
 		case(switchG_CMD):
 			num = std::stoi(cmd->args.front());

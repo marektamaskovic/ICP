@@ -155,7 +155,6 @@ int Deck::dequeue(Deck *other){
 			other->cards.front().deck = 11;
 
 			Card *c = new Card(other->cards.back());
-
 			currentSession.slot[currentSession.currentGame]->
 				history.push_back({10, 11, c, 1});
 
