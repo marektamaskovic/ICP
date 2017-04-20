@@ -49,8 +49,8 @@ command_t* parseCMD(std::string &cmdBuffer){
 
 	command_t *cmd = new command_t;
 
-	char* argument = new char[42];
-
+	char argument[42];
+	int ret;
 	if(cmdBuffer == "show()"){
 		cmd->type = show_CMD;
 	}
@@ -69,22 +69,36 @@ command_t* parseCMD(std::string &cmdBuffer){
 	else if(cmdBuffer == "quitGame()"){
 		cmd->type = quitG_CMD;
 	}
-	else if(sscanf(cmdBuffer.c_str(),"switchGame(%s)",argument) != EOF){
+	// FIXME 2 variants of moveC()?!?
+	else if((ret = (sscanf(cmdBuffer.c_str(),"moveC(%10s)",argument))) == 1){
+		std::string tmp = argument;
+		std::size_t found = tmp.find(",");
+
+		if (found!=std::string::npos){
+			strncpy(argument, tmp.substr(found+1, 3).c_str(), 6);
+			argument[3] = '\0';
+			tmp.erase(found);
+		}
+
+		cmd->args.push_back(tmp);
+		cmd->args.push_back(argument);
+		cmd->type = moveCard_CMD;
+	}
+	else if(sscanf(cmdBuffer.c_str(),"switchGame(%s)",argument) == 1){
 		cmd->args.push_back(argument);
 		cmd->type = switchG_CMD;
 	}
-	else if(sscanf(cmdBuffer.c_str(),"save(%s)",argument) != EOF){
+	else if(sscanf(cmdBuffer.c_str(),"save(%s)",argument) == 1){
 		cmd->args.push_back(argument);
 		cmd->type = save_CMD;
 	}
-	else if(sscanf(cmdBuffer.c_str(),"load(%s)",argument) != EOF){
+	else if(sscanf(cmdBuffer.c_str(),"load(%s)",argument) == 1){
 		cmd->args.push_back(argument);
 		cmd->type = load_CMD;
 	}
 	else
 		cmd->type = no_CMD;
 
-	delete(argument);
 	return cmd;
 }
 
@@ -97,11 +111,9 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			  << "'"
 			  << std::endl;
 
-	int num;
-	// Deck *flip = session->slot[session->currentGame]->flip;
-	// Deck *flop = session->slot[session->currentGame]->flop;
-	// Move moveTmp {flip, flop, flop->cards.back(), 1};
-	Card c;
+	int num, deckNumber;
+	std::vector<Card> vectCard;
+	Deck *tmpDeck = nullptr;
 	switch(cmd->type){
 		case(createG_CMD):
 			createGame(session);
@@ -138,17 +150,36 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			exit(0);
 			break;
 		case(popQueueDeck_CMD):
-			session->slot[session->currentGame]->flip->dequeue(session->slot
-												[session->currentGame]->flop);
+			session->slot[session->currentGame]->decks[12]->dequeue(session->slot
+												[session->currentGame]->decks[11]);
 			break;
 		case(moveCard_CMD):
 			// TODO moveCard(where, what)
-			// cislo deku a karta
-			if (cmd->args.size() > 1){
-				for (unsigned i = 0; i < cmd->args.size(); ++i)
-					std::cout << cmd->args[i] << "\n";
-				c = getCard(cmd->args[1]);
-				// session->slot[session->currentGame]->args[0].moveCards(c);
+			if (cmd->args.size() > 1 && session->currentGame != -1){
+				vectCard = parseCard(cmd->args[2], &deckNumber);
+				if (vectCard.size() == 0)
+					break;
+				tmpDeck = parseDeck(cmd->args[1]);
+				/* FIXME Ask for type ? Card or Deck, kinda does not matter
+				 *wether we place card at card or Card to Deck.
+				 */
+				num = tmpDeck->moveCards(vectCard);
+				/* Remove all cards that was swapped */
+				if (num != -1){
+					tmpDeck=session->slot[session->currentGame]->decks[deckNumber];
+					for (unsigned j = 0; j < tmpDeck->cards.size();++j){
+						if (tmpDeck->cards[j] == vectCard.back()){
+							for (unsigned i = j; i < (j + vectCard.size());++i){
+								tmpDeck->cards.erase(tmpDeck->cards.begin()+i);
+							}
+						}
+					}
+					// flip card
+					// tmpDeck->printDeck();
+					if (tmpDeck->cards.size() != 0)
+						if (tmpDeck->cards.back().visible == false)
+							tmpDeck->cards.back().changeVisibility();
+				}
 			}
 			break;
 		case(undo_CMD):

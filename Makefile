@@ -42,7 +42,7 @@ $(CLI):
 
 travis_compile:
 	@cd src/ && $(MAKE) hra2017-cli-tr
-	cp src/hra2017-cli ./hra2017-cli-tr
+	cp src/hra2017-cli ./hra2017-cli
 
 #FIXME, run CLI or GUI?
 run:

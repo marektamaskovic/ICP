@@ -12,43 +12,80 @@
 extern session_t currentSession;
 /* TODO documentation */
 Card::Card(): 	number(0),
-				color(heart),
-				visible(false),
-				deck(0),
-				deckPos(0){}
+				color(Heart),
+				visible(false){}
 
-Card::Card(int num, Color clr, int d, int dPos): 	number(num),
-													color(clr),
-													visible(false),
-													deck(d),
-													deckPos(dPos){}
+Card::Card(int num, Color clr):	number(num),
+								color(clr),
+								visible(false){}
 
 Card::Card(const Card &c): 	number(c.number),
 							color(c.color),
-							visible(c.visible),
-							deck(c.deck),
-							deckPos(c.deckPos){}
+							visible(c.visible){}
+
+void Card::printColor(int num){
+	switch(this->color){
+	case 0:
+		std::cout << BOLDRED << num << " H" << RESET << ",\t";
+		break;
+	case 1:
+		std::cout << BOLDBLACK << num << " S" << RESET << ",\t";
+		break;
+	case 2:
+		std::cout << BOLDRED << num << " D" << RESET << ",\t";
+		break;
+	case 3:
+		std::cout << BOLDBLACK << num << " C" << RESET << ",\t";
+		break;
+	}
+}
+
+void Card::printColor(std::string str){
+	switch(this->color){
+	case 0:
+		std::cout << BOLDRED << str << " H" << RESET << ",\t";
+		break;
+	case 1:
+		std::cout << BOLDBLACK << str << " S" << RESET << ",\t";
+		break;
+	case 2:
+		std::cout << BOLDRED << str << " D" << RESET << ",\t";
+		break;
+	case 3:
+		std::cout << BOLDBLACK << str << " C" << RESET << ",\t";
+		break;
+	}
+}
 
 void Card::printCard(){
-	// DEBUG
-	// std::cout << this->deck << ": ";
-	// std::cout << this->deckPos << ": ";
-	// TODO Fixme enum; {using switch}
+	Symbol sym;
+	std::string tmp;
 	if (this->visible == true){
-		switch(this->color){
-		case 0:
-			std::cout << BOLDRED << this->number << "H" << RESET << ",\t";
-			break;
+		switch(this->number){
 		case 1:
-			std::cout << BOLDBLACK << this->number << "S" << RESET << ",\t";
+			sym = A;
+			tmp = "A";
 			break;
-		case 2:
-			std::cout << BOLDRED << this->number << "D" << RESET << ",\t";
+		case 11:
+			sym = J;
+			tmp = "J";
 			break;
-		case 3:
-			std::cout << BOLDBLACK << this->number << "C" << RESET << ",\t";
+		case 12:
+			sym = Q;
+			tmp = "Q";
 			break;
+		case 13:
+			sym = K;
+			tmp = "K";
+			break;
+		default:
+			sym = undef;
 		}
+		if (sym != undef){
+			this->printColor(tmp);
+		}
+		else
+			this->printColor(this->number);
 	}
 	else
 		std::cout << "( # ),\t";
@@ -62,15 +99,18 @@ bool Card::operator==(const Card &rCard){
 	return this->number == rCard.number && this->color == rCard.color;
 }
 
-Deck::Deck(): 	cards(),
+Deck::Deck(): 	deck(0),
+				cards(),
 				position(starterDeck),
 				permissions(insert_get){}
 
-Deck::Deck(Permissions perm, Position pos):	cards(),
-											position(pos),
-											permissions(perm){}
+Deck::Deck(Permissions perm, Position pos, int num): deck(num),
+													 cards(),
+													 position(pos),
+													 permissions(perm){}
 
-Deck::Deck(const Deck &d): 	cards{d.cards},
+Deck::Deck(const Deck &d): 	deck(d.deck),
+							cards{d.cards},
 							position{d.position},
 							permissions{d.permissions}{}
 
@@ -79,29 +119,26 @@ void Deck::insertCard(Card &card){
 }
 
 /* check validity between two decks */
-/* FIXME we need other deck what if not enough permissions? */
 int Deck::checkValidity(Card &card){
 	// TODO K on empty deck!
 	if ( this->permissions == insert_get && card.visible == true){
 		// moving card to this , function to compare used
 		if (this->position == starterDeck){
-			if (cardCondition(this, card) == true){
+			if (cardCondition(this->cards.back(), card) == true){
 				return 0;
 			}
 		}
 		// every final deck has exactly 1 color and numbered from 1 to 13
 		else if (this->position == finalDeck){
-			if (this->cards.empty() && card.number == 1){
-				this->insertCard(card);
-				return 0;
+			if (this->cards.empty()){
+				if (card.number == 1){
+					return 0;
+				}
+				else
+					return-1;
 			}
 			else if ((card.number - 1) == this->cards.front().number){
 				if (card.color == this->cards.front().color){
-					this->insertCard(card);
-					if(card.deck < 7){
-						Deck *tmp = currentSession.slot[currentSession.currentGame]->decks[card.deck];
-						tmp->cards.erase(tmp->cards.begin());
-					}
 					return 0;
 				}
 			}
@@ -110,23 +147,38 @@ int Deck::checkValidity(Card &card){
 	return -1;
 }
 
+void Deck::pushCardVector(std::vector<Card> vect){
+	for (unsigned i = 0; i != vect.size();){
+		this->insertCard(vect.front());
+		vect.erase(vect.begin());
+	}
+}
 
-/* TODO mov cmd */
-int Deck::moveCards(Card &card){
-	card.printCard();
-	// TDO refecotor!
-	// if (cardCondition(this, other) == true)
-		// other->insertCards( (this->cards.front()) );
-	return 0;
+/* TODO Command pattern history */
+int Deck::moveCards(std::vector<Card> vect){
+	int result = -1;
+	// std::cout << vect.size();
+	if (vect.size() != 0){
+		result = this->checkValidity(vect.back());
+		// DEBUG
+		// std::cout << "Deck: \n";
+		// this->printDeck();
+		// vect.back().printCard();
+		// std::cout << "result is:" << result << "\n";
+		if (result == 0){
+			this->pushCardVector(vect);
+		}
+	}
+	return result;
 }
 
 Card &Deck::getLastCard(){
 	return this->cards.back();
 }
 /* 11 = flop deck
- * 10 = flip deck
- * negative for finalDecks?
- * 0-6 for starterDecks
+ * 12 = flip deck
+ * 0-3 finalDecks
+ * 4-10 for starterDecks
  */
 int Deck::dequeue(Deck *other){
 	if (this->permissions == insert && other->permissions == get){
@@ -134,14 +186,13 @@ int Deck::dequeue(Deck *other){
 		if (this->cards.empty()){
 			Card *c = new Card(other->cards.back());
 			currentSession.slot[currentSession.currentGame]->
-				history.push_back({11, 10, c, 1});
+				history.push_back({11, 12, c, 1});
 
 			for (unsigned i = 0; i != other->cards.size();){
 				// Again from start
 				other->cards.front().changeVisibility();
 				this->cards.push_back(other->cards.front());
 				other->cards.erase(other->cards.begin());
-				this->cards.front().deck = 10;
 			}
 
 			return 0;
@@ -152,11 +203,10 @@ int Deck::dequeue(Deck *other){
 			// to flop, change visibility
 			other->cards.back().changeVisibility();
 			this->cards.erase(this->cards.begin());
-			other->cards.front().deck = 11;
 
 			Card *c = new Card(other->cards.back());
 			currentSession.slot[currentSession.currentGame]->
-				history.push_back({10, 11, c, 1});
+				history.push_back({12, 11, c, 1});
 
 			return 0;
 		}
@@ -165,11 +215,9 @@ int Deck::dequeue(Deck *other){
 }
 
 void Deck::printDeck(){
+	std::cout << this->deck << " ";
 	if (this->permissions == insert || this->permissions == get){
-		// TODO print deck no.
 		std::cout << "Deck {\t";
-		// for (unsigned i = 0; i < this->cards.size(); i++)
-		// 	this->cards[i].printCard();
 		if (this->cards.size() > 0)
 			this->cards[this->cards.size()-1].printCard();
 		std::cout << "\b\b  \b\b\t}\n";
@@ -206,46 +254,31 @@ Move* Deck::hint(Deck *other, Card &card){
 
 int Game::current_count = 0;
 /* TODO documentation */
-Game::Game(	const Game &G) : history(), mainDeck(), decks(), finalDecks(),
-			flip(), flop(){
-	for(int i = 0; i < 7; i++){
+Game::Game(	const Game &G) : history(), mainDeck(), decks(){
+	for(int i = 0; i < 13; i++){
 		decks[i] = G.decks[i];
 	}
-
-	for(int i = 0; i < 4; i++){
-		finalDecks[i] = G.finalDecks[i];
-	}
-	flip = G.flip;
-	flop = G.flop;
 }
 /* TODO documentation */
 Game& Game::operator=(const Game &G){
 
 	if (this != &G) { // self-assignment check expected
-
-
 		std::copy(G.history.begin(), G.history.end(),
               std::back_inserter(this->history));
 
 		std::copy(G.mainDeck.begin(), G.mainDeck.end(),
               std::back_inserter(this->mainDeck));
 
-		for(int i = 0; i < 7; i++){
+		for(int i = 0; i < 13; i++){
 			this->decks[i] = G.decks[i];
 		}
-
-		for(int i = 0; i < 4; i++){
-			this->finalDecks[i] = G.finalDecks[i];
-		}
-		this->flip = G.flip;
-		this->flop = G.flop;
     }
     return *this;
 
 
 }
 /* TODO documentation , repair shuffle */
-Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
+Game::Game() :  history(), mainDeck(), decks(){
 	current_count++;
 	id = current_count;
 	position = getPosition();
@@ -253,7 +286,7 @@ Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
 	for (int i =0; i < 4; i++){
 		clr = static_cast<Color> (i);
 		for (int j = 1; j < 14; j++){
-			Card card (Card(j, clr, 0, 0));
+			Card card (Card(j, clr));
 			mainDeck.push_back(card);
 		}
 	}
@@ -262,37 +295,32 @@ Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
 	std::srand ( unsigned ( std::time(0) ) );
 	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 
-	flip = new Deck (insert, flipDeck);
-	flop = new Deck (get, flopDeck);
+	decks[12] = new Deck (insert, flipDeck, 12);
+	decks[11] = new Deck (get, flopDeck, 11);
 
-	for(int i = 0; i < 7; i++){
-		decks[i] = new Deck(insert_get,starterDeck);
+	for(int i = 4; i < 11; i++){
+		decks[i] = new Deck(insert_get,starterDeck, i);
 	}
 
 	for(int i = 0; i < 4; i++){
-		finalDecks[i] = new Deck(insert_get,starterDeck);
+		decks[i] = new Deck(insert_get,finalDeck, i);
 	}
 
 	// shuffle one more time to get more random shuffeled cards
 	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
-	for (int j = 0; j < 7; j++){
+	for (int j = 4; j < 11; j++){
 
-		for (int i = 0; i <= j; i++){
-			mainDeck.front().deckPos = 6-j;
-			mainDeck.front().deck = i;
+		for (int i = 4; i <= j; i++){
 			if (i == j){
 				mainDeck.front().changeVisibility();
 			}
 
-			decks[i]->insertCard(mainDeck.front());
+			decks[j]->insertCard(mainDeck.front());
 			mainDeck.erase(mainDeck.begin());
 		}
 	}
-
 	for (unsigned i = 0; i != mainDeck.size();){
-		// mainDeck.front().deckPos = i;
-		mainDeck.front().deck = 10;
-		this->flip->insertCard(mainDeck.back());
+		this->decks[12]->insertCard(mainDeck.back());
 		mainDeck.erase(mainDeck.end());
 	}
 	// TODO clear or leave it?
@@ -301,16 +329,9 @@ Game::Game() :  history(), mainDeck(), decks(), finalDecks(), flip(), flop(){
 
 Game::~Game(){
 	current_count--;
-
-	for(int i = 0; i < 7; i++){
+	for(int i = 0; i < 13; i++){
 		delete(this->decks[i]);
 	}
-
-	for(int i = 0; i < 4; i++){
-		delete(this->finalDecks[i]);
-	}
-	delete(this->flip);
-	delete(this->flop);
 }
 
 /* TODO add JSON library, convert - history deck id position - into json saved
@@ -325,30 +346,26 @@ int Game::load(){
 }
 /* FIXME maybe better printing skills? :D */
 void Game::showGame(){
-	this->flip->printDeck();
-	this->flop->printDeck();
-	for (int i = 0; i < 7; ++i){
+	for (int i = 12; i != -1; --i){
 		this->decks[i]->printDeck();
 	}
-	for (int i = 0; i < 4; ++i)
-		this->finalDecks[i]->printDeck();
 }
 
 
-bool cardCondition(Deck *first, Card &card){
-	if (first->cards.front().number ==
-		(card.number - 1)){
+bool cardCondition(Card &other, Card &card){
+	if (card.number ==
+		(other.number - 1)){
 
-		if((first->cards.front().color == club ||
-			first->cards.front().color == heart) &&
-			(card.color == spade ||
-			card.color == diamond)){
+		if((other.color == Club ||
+			other.color == Heart) &&
+			(card.color == Spade ||
+			card.color == Diamond)){
 			return true;
 		}
-		else if ((first->cards.front().color == spade ||
-				first->cards.front().color == diamond) &&
-				(card.color == club ||
-				card.color == heart)){
+		else if ((other.color == Spade ||
+				other.color == Diamond) &&
+				(card.color == Club ||
+				card.color == Heart)){
 			return true;
 		}
 	}
@@ -361,18 +378,18 @@ void printMove(std::vector<Move> mov){
 	std::string from = "";
 	std::string to = "";
 	for (unsigned i = 0; i < mov.size(); ++i){
-		if (mov[i].from == 10)
+		if (mov[i].from == 12)
 			from = "From - Flip deck: ";
-		if (mov[i].to == 10)
+		if (mov[i].to == 12)
 			to = "To - Flip deck: ";
 		if (mov[i].from == 11)
 			from = "From - Flop deck: ";
 		if (mov[i].to == 11)
 			to = "To - Flip deck";
 
-		if (mov[i].from < 7)
+		if (mov[i].from < 10 && mov[i].from > 3)
 			from = "From - Starter deck: ";
-		if (mov[i].to < 7)
+		if (mov[i].to < 10 && mov[i].to > 3)
 			to = "To - Starter deck: ";
 		std::cout << from << "\n";
 		std::cout << to << "\n";
@@ -388,68 +405,133 @@ void clearHistory(std::vector<Move> mv){
 	}
 }
 
-Card & getCard(std::string str){
+std::vector<Card> parseCard(std::string str, int *deckNumber){
 	int num = 0;
-	// FIXME parse card name by sscanf!
-	std::cout << "GetCard" << str[0] << "\n";
-	if (str.length() == 2){
-		if (isdigit(str[0])){
-			std::cout << "IFF";
-			num = str[0];
-		}
+	int check;
+	std::vector<Card> vect;
+	if (str[str.length() - 1] == ')'){
+		str.erase(str.length() - 1);
 	}
-	std::cout << "Number of card" << num << "\n";
-	// Card c = Card(std::stoi(str[0]), std::stoi(str[1]), 0, 0);
-	// (void) c;
-	int curr = currentSession.currentGame;
-	for (int i = 0; i < 7; ++i){
+	check = sscanf(str.c_str(),"%d",&num);
+	std::cout << check;
+	if (check != 1)
+		return vect;
+	std::string tmp = std::to_string(num);
+	std::size_t pos = str.find(tmp);
 
-		currentSession.slot[curr]->decks[i]->printDeck();
+	Color clr = Heart;
+	str = str.substr(pos + tmp.length());
+	int tmpNum = str[0];
+
+	Card *c = nullptr;
+	switch (tmpNum){
+	case 'H':
+		clr = Heart;
+		break;
+	case 'S':
+		clr = Spade;
+		break;
+	case 'D':
+		clr = Diamond;
+		break;
+	case 'C':
+		clr = Club;
+		break;
+	default:
+		return vect;
+		break;
 	}
-	return currentSession.slot[curr]->decks[0]->cards.front();
+	if (!(num >= 1 && num <= 13)){
+		std::cout << "number : " << num << "\n";
+		return vect;
+	}
+	c = new Card(num, clr);
+	(*c).changeVisibility();
+
+	int curr = currentSession.currentGame;
+	Card tmpCard;
+	bool found = false;
+
+	for (int i = 0; i < 12; ++i){
+		for (unsigned j = 0; j < currentSession.slot[curr]->decks[i]->cards.size(); ++j){
+			tmpCard = currentSession.slot[curr]->decks[i]->cards[j];
+
+			if (found == false){
+				if (tmpCard.visible == true && tmpCard == *c){
+					*deckNumber = i;
+					delete (c);
+					c = new Card(tmpCard);
+					found = true;
+					vect.push_back(std::move(tmpCard));
+				}
+			}
+			else{
+				if (tmpCard.visible == false){
+					found = false;
+					break;
+				}
+				c = checkNext(tmpCard,*c);
+				if (c != nullptr)
+					vect.push_back(*c);
+				found = false;
+			}
+		}
+		if (found == true)
+			break;
+	}
+
+	// FIXME one more loop
+	// 	else{
+	// 	if (tmpCard.visible == false){
+	// 		found = false;
+	// 		break;
+	// 	}
+	// 	c = checkNext(tmpCard,*c);
+	// 	if (c != nullptr)
+	// 		vect.push_back(*c);
+	// 	found = false;
+	// }
+
+	delete(c);
+	return vect;
+}
+
+Deck *parseDeck(std::string str){
+	int num = std::stoi(str);
+	Deck *deck = nullptr;
+	int curr = currentSession.currentGame;
+
+	switch(num){
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+		deck = currentSession.slot[curr]->decks[num];
+		break;
+
+	default:
+		return deck;
+	}
+	return deck;
 }
 
 
-// switch(a1){
-// 	case(0):
-// 		type = Final;
-// 		index = a1;
-// 		break;
-// 	case(4):
-// 		type = FINAL;
-// 		index = a1;
-// 		break;
-// 	case(4):
-// 		type = FINAL;
-// 		index = a1;
-// 		break;
-// 	case(4):
-// 		type = FINAL;
-// 		index = a1;
-// 		break;
-// 	case(4):
-// 		type = DECKS;
-// 		index = a1 - 4;
-// 		break;
-// 	case(4):
-// 		type = DECKS;
-// 		index = a1 - 4;
-// 		break;
-// 	case(4):
-// 		type = DECKS;
-// 		index = a1 - 4;
-// 		break;
-// 	case(4):
-// 		type = DECKS;
-// 		index = a1 - 4;
-// 		break;
-// 	case(4):
-// 		type = FLIP;
-// 		index = a1 - 10;
-// 		break;
-// 	case(4):
-// 		type = FLOP;
-// 		index = a1 - 11;
-// 		break;
+Card *checkNext(Card &other, Card &main){
+	bool ret = false;
+	other.printCard();
+	main.printCard();
 
-// }
+	ret = cardCondition(main,other);
+	if (ret == true)
+		return &main;
+	return nullptr;
+}

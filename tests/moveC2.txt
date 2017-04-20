@@ -1,0 +1,4 @@
+createGame()
+moveC(1,1H)
+moveC(5,2S)
+show()
