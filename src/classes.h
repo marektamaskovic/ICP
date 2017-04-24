@@ -30,17 +30,7 @@ typedef struct {
 	int from;
 	int to;
 	Card *card;
-	unsigned numberOfCards; // successor
 }Move;
-
-/* Interface for Command pattern */
-class ICommand{
-// int a;
-// public:
-	// virtual void executePopQD() =0;
-	// virtual void executeMoveCards() =0;
-	// virtual void undo() =0;
-};
 
 class Card final{
 private:
@@ -51,7 +41,6 @@ public:
 	int number;
 	Color color;
 	bool visible;
-	// unsigned deckPos = 0;
 
 	Card();
 	Card(const Card &);
@@ -62,19 +51,27 @@ public:
 
 class Game {
 // friend class Deck;
+/* 11 = flop deck
+ * 12 = flip deck
+ * 0-3 finalDecks
+ * 4-10 for starterDecks
+ */
 public:
 	std::vector<Move> history;
 	std::vector<Card> mainDeck;
 	Deck *decks [13];
 	int m = 0;
+
 	Game();
 	Game(const Game &G);
 	Game& operator=(const Game &G);
 	~Game();
 	/* FILE */
+	// TODO JSON SAVE LOAD
 	int save();
 	int load();
 	void showGame();
+	Move* hint();
 	static inline int numberOfGames(){ return current_count; }
 	static int current_count;
 private:
@@ -82,9 +79,8 @@ private:
 	int position = 0;
 };
 
-class Deck: ICommand{
+class Deck{
 private:
-	int checkValidity(Card &card);
 	void pushCardVector(std::vector<Card>);
 public:
 	int deck = 0;
@@ -97,16 +93,10 @@ public:
 	Deck(const Deck&);
 	inline void insertCard(Card &);
 	int moveCards(std::vector<Card> );
-	Move* hint(Deck *, Card &);
 	inline Card& getLastCard();
 	void printDeck();
 	int dequeue(Deck *);
-
-	/* Command pattern */
-	// void executePopQD();
-	// void executeMoveCards();
-	//  reverzne operacie k MoveCards a PopQD podla presunu
-	// void undo();
+	int checkValidity(Card &card);
 };
 
 
@@ -118,5 +108,6 @@ void clearHistory(std::vector<Move>);
 std::vector<Card> parseCard(std::string, int *);
 Deck *parseDeck(std::string);
 Card *checkNext(Card &, Card &);
+void undo(std::vector<Move>);
 
 #endif

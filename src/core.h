@@ -16,7 +16,7 @@ typedef struct{
 	// public attributes
 	class Game* slot[4];
 	bool openSlot[4] = {false,};
-	int currentGame = -1; // TODO can we choose a better name?
+	int currentGame = -1;
 
 	// public methods
 	int isSpace(void); // return position of first open slot or -1 when error
@@ -36,7 +36,8 @@ typedef enum{
 	quit_CMD,
 	popQueueDeck_CMD,
 	moveCard_CMD,
-	undo_CMD
+	undo_CMD,
+	hint_CMD
 } command_n;
 
 typedef struct{
@@ -88,6 +89,12 @@ inline std::string getCommandName(command_n a){
 		break;
 	case(moveCard_CMD):
 		return "moveCard";
+		break;
+	case(hint_CMD):
+		return "hint";
+		break;
+	case(undo_CMD):
+		return "undo";
 		break;
 	default:
 		return "";

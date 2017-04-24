@@ -60,6 +60,9 @@ command_t* parseCMD(std::string &cmdBuffer){
 	else if(cmdBuffer == "undo()"){
 		cmd->type = undo_CMD;
 	}
+	else if (cmdBuffer == "hint()"){
+		cmd->type = hint_CMD;
+	}
 	else if(cmdBuffer == "createGame()"){
 		cmd->type = createG_CMD;
 	}
@@ -111,9 +114,11 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			  << "'"
 			  << std::endl;
 
-	int num, deckNumber;
+	int num, deckNumber, historyNumber;
 	std::vector<Card> vectCard;
+	Card *pushCard = nullptr;
 	Deck *tmpDeck = nullptr;
+	Move *storeMove = nullptr;
 	switch(cmd->type){
 		case(createG_CMD):
 			createGame(session);
@@ -141,7 +146,6 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 		case(quit_CMD):
 			for(int i = 0; i < 4; ++i){
 				if (session->openSlot[i] == true){
-					printMove(session->slot[i]->history);
 					clearHistory(session->slot[session->currentGame]->history);
 					delete session->slot[i];
 				}
@@ -150,11 +154,9 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			exit(0);
 			break;
 		case(popQueueDeck_CMD):
-			session->slot[session->currentGame]->decks[12]->dequeue(session->slot
-												[session->currentGame]->decks[11]);
+			session->slot[session->currentGame]->decks[12]->dequeue(session->slot[session->currentGame]->decks[11]);
 			break;
 		case(moveCard_CMD):
-			// TODO moveCard(where, what)
 			if (cmd->args.size() > 1 && session->currentGame != -1){
 				vectCard = parseCard(cmd->args[2], &deckNumber);
 				if (vectCard.size() == 0)
@@ -163,6 +165,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 				/* FIXME Ask for type ? Card or Deck, kinda does not matter
 				 *wether we place card at card or Card to Deck.
 				 */
+				historyNumber = tmpDeck->deck;
 				num = tmpDeck->moveCards(vectCard);
 				/* Remove all cards that was swapped */
 				if (num != -1){
@@ -175,15 +178,26 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 						}
 					}
 					// flip card
-					// tmpDeck->printDeck();
 					if (tmpDeck->cards.size() != 0)
 						if (tmpDeck->cards.back().visible == false)
 							tmpDeck->cards.back().changeVisibility();
+					pushCard = new Card(vectCard.back());
+					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard});
 				}
 			}
 			break;
 		case(undo_CMD):
-			printMove(session->slot[session->currentGame]->history);
+			undo(session->slot[session->currentGame]->history);
+			break;
+		case(hint_CMD):
+			storeMove = session->slot[session->currentGame]->hint();
+			if (storeMove != nullptr){
+				std::cout << "From: " << storeMove->from << "\n";
+				std::cout << "To: " << storeMove->to << "\n";
+				storeMove->card->printCard();
+				delete(storeMove->card);
+				delete(storeMove);
+			}
 			break;
 		default:
 			std::cout << "Command '" << cmdBuffer << "' is not valid!\n";
