@@ -19,6 +19,10 @@ Card::Card(int num, Color clr):	number(num),
 								color(clr),
 								visible(false){}
 
+Card::Card(int num, Color clr, bool vis):	number(num),
+											color(clr),
+											visible(vis){}								
+
 Card::Card(const Card &c): 	number(c.number),
 							color(c.color),
 							visible(c.visible){}
@@ -252,6 +256,10 @@ Game& Game::operator=(const Game &G){
 
 /* TODO repair shuffle */
 Game::Game() :  history(), mainDeck(), decks(){
+	/* FIXME tu to urcite pada lebo ked vytvoris hru iba ju inicializujes
+			 na prazdnu triedu nie ju hned plnit kartamy! v createGame 
+			 ma byt to plnenie nie tu! Preto su leaky.
+	*/
 	current_count++;
 	id = current_count;
 	position = getPosition();

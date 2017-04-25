@@ -43,7 +43,7 @@ typedef enum{
 
 typedef struct{
 	command_n type = no_CMD;
-	std::vector<std::string> args {""};
+	std::vector<std::string> args {};
 } command_t;
 
 

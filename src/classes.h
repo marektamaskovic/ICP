@@ -45,6 +45,7 @@ public:
 	Card();
 	Card(const Card &);
 	Card(int ,Color);
+	Card(int ,Color, bool);
 	void printCard();
 	void changeVisibility();
 };
@@ -84,6 +85,7 @@ private:
 	void pushCardVector(std::vector<Card>);
 public:
 	int deck = 0;
+	// ASK preco tu nieje ukazatel?
 	std::vector<Card> cards;
 	Position position;
 	Permissions permissions;

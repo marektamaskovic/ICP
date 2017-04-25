@@ -88,16 +88,17 @@ command_t* parseCMD(std::string &cmdBuffer){
 		cmd->type = moveCard_CMD;
 	}
 	else if(sscanf(cmdBuffer.c_str(),"switchGame(%s)",argument) == 1){
+		argument[std::strlen(argument)-1] = '\0';
 		cmd->args.push_back(argument);
 		cmd->type = switchG_CMD;
 	}
 	else if(sscanf(cmdBuffer.c_str(),"save(%s)",argument) == 1){
 		argument[std::strlen(argument)-1] = '\0';
 		cmd->args.push_back(argument);
-		// std::cout << "save: >" << cmd->args.size() << "<" << std::endl;
 		cmd->type = save_CMD;
 	}
 	else if(sscanf(cmdBuffer.c_str(),"load(%s)",argument) == 1){
+		argument[std::strlen(argument)-1] = '\0';
 		cmd->args.push_back(argument);
 		cmd->type = load_CMD;
 	}
@@ -143,13 +144,18 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			break;
 		case(save_CMD):
 			if(session->currentGame >= 0){
-				save(cmd->args.back(), *session->slot[session->currentGame]);
+				save(cmd->args.front(), *session->slot[session->currentGame]);
 			}
 			else{
 				std::cerr << "Game not selected!" << std::endl;
 			}
 			break;
 		case(load_CMD):
+			std::cout << ">" << cmd->args.front() << "<" << std::endl;
+			std::cout << ">" << cmd->args.back() << "<" << std::endl;
+			load_game(cmd->args.front(), session);
+			// if( != 0)
+				// err_msg("load failed!");
 			break;
 		case(quit_CMD):
 			for(int i = 0; i < 4; ++i){
