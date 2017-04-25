@@ -4,7 +4,7 @@
 int save(std::string &filename, Game &g){
 	std::cout << "save" << std::endl;
 	json j;
-	// datum?
+
 	j["m"] = g.m;
 	j["decks"] = json::array();
 
@@ -61,27 +61,31 @@ int load_game(std::string &filename, session_t *session){
 
 	for (json::iterator it = j_data["decks"].begin(); it != j_data["decks"].end(); ++it) {
 		Deck *deck = new Deck();
+
 		deck->deck = deck_index;
 		load_deck(it, deck);
-		g->decks[deck_index++] = deck;
+		g->decks[deck_index] = deck;
+		std::cout << g->decks[deck_index]->cards.size() << std::endl;
+		++deck_index;
 	}
 
 
 	return 0;
 }
 
-
-
-
 int load_deck(json::iterator element, Deck *deck){
 	// std::cout << deck->deck << std::endl;
 	deck->permissions = (*element)["permissions"];
 	deck->position = (*element)["position"];
 
+	int i = 0;
+
 	for(auto& card: (*element)["cards"]){
-		Card *c = new Card(static_cast<int>(card["number"]), static_cast<Color>(card["color"]), true);
+		Card *c = new Card(static_cast<int>(card["number"]), static_cast<Color>(card["color"]), card["visible"]);
 		deck->cards.push_back(*c);
+		delete(c); ++i;
 	}
+	// std::cout << i << " " << deck->cards.size() << std::endl;
 
 	return 0;
 }

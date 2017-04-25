@@ -119,10 +119,6 @@ Deck::Deck(const Deck &d): 	deck(d.deck),
 							position{d.position},
 							permissions{d.permissions}{}
 
-void Deck::insertCard(Card &card){
-	this->cards.push_back(card);
-}
-
 /* check validity between two decks */
 int Deck::checkValidity(Card &card){
 	if ( this->permissions == insert_get && card.visible == true){
@@ -213,19 +209,19 @@ int Deck::dequeue(Deck *other){
 
 void Deck::printDeck(){
 	std::cout << this->deck << " ";
-	if (this->permissions == insert || this->permissions == get){
-		std::cout << "Deck {  ";
-		if (this->cards.size() > 0)
-			this->cards[this->cards.size()-1].printCard();
-		std::cout << "}\n";
-	}
-	else{
+	// if (this->permissions == insert || this->permissions == get){
+	// 	std::cout << "Deck {  ";
+	// 	if (this->cards.size() > 0)
+	// 		this->cards[this->cards.size()-1].printCard();
+	// 	std::cout << "}\n";
+	// }
+	// else{
 		std::cout << "Deck {  ";
 		for (unsigned i = 0; i < this->cards.size(); i++){
 			this->cards[i].printCard();
 		}
-		std::cout << "}\n";
-	}
+		std::cout << "\b\b\b}\n";
+	// }
 }
 
 /***************************************************/
@@ -256,54 +252,10 @@ Game& Game::operator=(const Game &G){
 
 /* TODO repair shuffle */
 Game::Game() :  history(), mainDeck(), decks(){
-	/* FIXME tu to urcite pada lebo ked vytvoris hru iba ju inicializujes
-			 na prazdnu triedu nie ju hned plnit kartamy! v createGame 
-			 ma byt to plnenie nie tu! Preto su leaky.
-	*/
 	current_count++;
 	id = current_count;
 	position = getPosition();
-	Color clr;
-	for (int i =0; i < 4; i++){
-		clr = static_cast<Color> (i);
-		for (int j = 1; j < 14; j++){
-			Card card (Card(j, clr));
-			mainDeck.push_back(card);
-		}
-	}
-	/* Game will create all decks at first not filled with cards */
-	//shuffling cards
-	std::srand ( unsigned ( std::time(0) ) );
-	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
-
-	decks[12] = new Deck (insert, flipDeck, 12);
-	decks[11] = new Deck (get, flopDeck, 11);
-
-	for(int i = 4; i < 11; i++){
-		decks[i] = new Deck(insert_get,starterDeck, i);
-	}
-
-	for(int i = 0; i < 4; i++){
-		decks[i] = new Deck(insert_get,finalDeck, i);
-	}
-
-	// shuffle one more time to get more random shuffeled cards
-	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
-	for (int j = 4; j < 11; j++){
-
-		for (int i = 4; i <= j; i++){
-			if (i == j){
-				mainDeck.front().changeVisibility();
-			}
-
-			decks[j]->insertCard(mainDeck.front());
-			mainDeck.erase(mainDeck.begin());
-		}
-	}
-	for (unsigned i = 0; i != mainDeck.size();){
-		this->decks[12]->insertCard(mainDeck.back());
-		mainDeck.erase(mainDeck.end());
-	}
+	
 }
 
 Game::~Game(){

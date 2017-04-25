@@ -93,12 +93,14 @@ public:
 	Deck();
 	Deck(Permissions, Position, int);
 	Deck(const Deck&);
-	inline void insertCard(Card &);
 	int moveCards(std::vector<Card> );
 	inline Card& getLastCard();
 	void printDeck();
 	int dequeue(Deck *);
 	int checkValidity(Card &card);
+	inline void insertCard(Card &card){
+		this->cards.push_back(card);
+	}
 };
 
 

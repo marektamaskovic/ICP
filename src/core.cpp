@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "core.h"
+#include "classes.h"
 #include "color.h"
 #include "save.h"
 
@@ -229,6 +230,50 @@ int createGame(session_t *session){
 	if( (pos = session->addGame(newGame)) < 0){
 		return -1;
 	}
+
+
+	Color clr;
+	for (int i =0; i < 4; i++){
+		clr = static_cast<Color> (i);
+		for (int j = 1; j < 14; j++){
+			Card card (Card(j, clr));
+			newGame->mainDeck.push_back(card);
+		}
+	}
+	/* Game will create all decks at first not filled with cards */
+	//shuffling cards
+	std::srand ( unsigned ( std::time(0) ) );
+	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
+
+	newGame->decks[12] = new Deck (insert, flipDeck, 12);
+	newGame->decks[11] = new Deck (get, flopDeck, 11);
+
+	for(int i = 4; i < 11; i++){
+		newGame->decks[i] = new Deck(insert_get,starterDeck, i);
+	}
+
+	for(int i = 0; i < 4; i++){
+		newGame->decks[i] = new Deck(insert_get,finalDeck, i);
+	}
+
+	// shuffle one more time to get more random shuffeled cards
+	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
+	for (int j = 4; j < 11; j++){
+
+		for (int i = 4; i <= j; i++){
+			if (i == j){
+				newGame->mainDeck.front().changeVisibility();
+			}
+
+			newGame->decks[j]->insertCard(newGame->mainDeck.front());
+			newGame->mainDeck.erase(newGame->mainDeck.begin());
+		}
+	}
+	for (unsigned i = 0; i != newGame->mainDeck.size();){
+		newGame->decks[12]->insertCard(newGame->mainDeck.back());
+		newGame->mainDeck.erase(newGame->mainDeck.end());
+	}
+
 	session->currentGame = pos;
 	std::cout << "createGame"
 			  << std::endl
