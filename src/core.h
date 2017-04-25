@@ -5,11 +5,12 @@
  *          xvasko12 - Vaško Martin
  */
 
-#ifndef CORE
-#define CORE
+#ifndef CORE_H
+#define CORE_H
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include "classes.h"
 
 typedef struct{

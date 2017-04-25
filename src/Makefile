@@ -12,7 +12,7 @@ CXX=g++
 CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++11 -Weffc++ -g3
 CXXLIBS=
 LDFLAGS=-L.
-DEPS=core.o classes.o
+DEPS=core.o classes.o save.o
 BIN=hra2017 hra2017-cli
 
 #Colors
