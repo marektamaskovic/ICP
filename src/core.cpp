@@ -38,7 +38,6 @@ int session_t::addGame(class Game *g){
 int session_t::removeGame(int pos){
 	if(this->openSlot[pos] == true){
 		this->openSlot[pos] = false;
-		// FIXME only remove game or should I call a destructor???
 		this->slot[pos] = nullptr;
 		return 0;
 	}
