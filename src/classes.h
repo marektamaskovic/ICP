@@ -17,9 +17,11 @@
 enum Symbol{A=1,J=11,Q,K,undef};
 enum Color{Heart,Spade,Diamond,Club};
 
-enum Position{flipDeck=1, flopDeck, starterDeck, finalDeck};
+enum Position{stack=1, waste, pileau, foundation};
 enum Permissions{insert=1, get, insert_get};
 // TODO Doxygen
+extern int count_cards_end_game;
+
 
 class Card;
 class Game;
@@ -30,6 +32,7 @@ typedef struct {
 	int from;
 	int to;
 	Card *card;
+	bool turnedUp;
 }Move;
 
 class Card final{
@@ -47,7 +50,11 @@ public:
 	Card(int ,Color);
 	Card(int ,Color, bool);
 	void printCard();
-	void changeVisibility();
+	inline void changeVisibility(){
+		this->visible = !this->visible;
+		if (this->visible == true) { ++count_cards_end_game; }
+		else { --count_cards_end_game; }
+	};
 };
 
 class Game {
@@ -68,9 +75,6 @@ public:
 	Game& operator=(const Game &G);
 	~Game();
 	/* FILE */
-	// TODO JSON SAVE LOAD
-	int save();
-	int load();
 	void showGame();
 	Move* hint();
 	static inline int numberOfGames(){ return current_count; }
@@ -98,9 +102,7 @@ public:
 	void printDeck();
 	int dequeue(Deck *);
 	int checkValidity(Card &card);
-	inline void insertCard(Card &card){
-		this->cards.push_back(card);
-	}
+	inline void insertCard(Card &card){ this->cards.push_back(card); }
 };
 
 
@@ -111,7 +113,8 @@ void printMove(std::vector<Move>);
 void clearHistory(std::vector<Move>);
 std::vector<Card> parseCard(std::string, int *);
 Deck *parseDeck(std::string);
-Card *checkNext(Card &, Card &);
-void undo(std::vector<Move>);
+Card *checkNext(Card &, Card *);
+std::vector<Move> undo(std::vector<Move>);
+void finishGame();
 
 #endif

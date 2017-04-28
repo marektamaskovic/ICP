@@ -1,0 +1,3 @@
+createGame()
+show()
+quit()

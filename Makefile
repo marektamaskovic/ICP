@@ -46,7 +46,7 @@ travis_compile:
 
 #FIXME, run CLI or GUI?
 run:
-	./hra2017-cli < ./tests/popQ1.txt
+	./hra2017-cli < ./examples/popQ1.txt
 
 doc:
 	cd src/ && doxygen doxyfile

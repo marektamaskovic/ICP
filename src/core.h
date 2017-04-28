@@ -49,6 +49,7 @@ typedef struct{
 
 static int position[] = {0, 0, 0, 0};
 
+
 inline int getPosition(void){
 	for (int i = 0; i < 4; i++)
 	{

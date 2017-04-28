@@ -14,6 +14,8 @@
 #include "save.h"
 
 extern session_t currentSession;
+int	count_cards_end_game = 0;
+
 
 int session_t::isSpace(void){
 	for(int i = 0; i < 4; i++)
@@ -72,8 +74,10 @@ command_t* parseCMD(std::string &cmdBuffer){
 	else if(cmdBuffer == "quitGame()"){
 		cmd->type = quitG_CMD;
 	}
-	// FIXME 2 variants of moveC()?!?
+	// FIXME 2 variants of moveC()?!? - definitely yes, when we got enough
+	// time do 2 variatnts - decknum, Cardfrom, Cardto, Cardfrom; just parser
 	else if((ret = (sscanf(cmdBuffer.c_str(),"moveC(%10s)",argument))) == 1){
+
 		std::string tmp = argument;
 		std::size_t found = tmp.find(",");
 
@@ -117,7 +121,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			  << "'"
 			  << std::endl;
 
-	int num, deckNumber, historyNumber;
+	int num, deckNumber , historyNumber;
 	std::vector<Card> vectCard;
 	Card *pushCard = nullptr;
 	Deck *tmpDeck = nullptr;
@@ -127,8 +131,6 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			createGame(session);
 			break;
 		case(show_CMD):
-			// DEBUG
-			// std::cout << "Current Game is: " << session->currentGame << "\n";
 			if (session->currentGame != -1)
 				session->slot[session->currentGame]->showGame();
 			break;
@@ -140,7 +142,6 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 		case(quitG_CMD):
 			session->openSlot[session->currentGame] = false;
 			delete session->slot[session->currentGame];
-			// TODO prvy volny slot , ak nie je volny vratis sa spat
 			break;
 		case(save_CMD):
 			if(session->currentGame >= 0){
@@ -151,11 +152,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			}
 			break;
 		case(load_CMD):
-			std::cout << ">" << cmd->args.front() << "<" << std::endl;
-			std::cout << ">" << cmd->args.back() << "<" << std::endl;
 			load_game(cmd->args.front(), session);
-			// if( != 0)
-				// err_msg("load failed!");
 			break;
 		case(quit_CMD):
 			for(int i = 0; i < 4; ++i){
@@ -172,13 +169,10 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			break;
 		case(moveCard_CMD):
 			if (cmd->args.size() > 1 && session->currentGame != -1){
-				vectCard = parseCard(cmd->args[2], &deckNumber);
+				vectCard = parseCard(cmd->args[1], &deckNumber);
 				if (vectCard.size() == 0)
 					break;
-				tmpDeck = parseDeck(cmd->args[1]);
-				/* FIXME Ask for type ? Card or Deck, kinda does not matter
-				 *wether we place card at card or Card to Deck.
-				 */
+				tmpDeck = parseDeck(cmd->args[0]);
 				historyNumber = tmpDeck->deck;
 				num = tmpDeck->moveCards(vectCard);
 				/* Remove all cards that was swapped */
@@ -191,24 +185,32 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 							}
 						}
 					}
-					// flip card
-					if (tmpDeck->cards.size() != 0)
-						if (tmpDeck->cards.back().visible == false)
+					pushCard = new Card(vectCard.front());
+					if (tmpDeck->cards.size() != 0){
+
+						if (tmpDeck->cards.back().visible == false){
+							session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
 							tmpDeck->cards.back().changeVisibility();
-					pushCard = new Card(vectCard.back());
-					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard});
+						}
+						else
+							session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
+					}else {
+						session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,true});
+					}
 				}
 			}
 			break;
 		case(undo_CMD):
-			undo(session->slot[session->currentGame]->history);
+			session->slot[session->currentGame]->history = undo(session->slot[session->currentGame]->history);
 			break;
+		// FIXME hint not all cards are iterated just back / front card
 		case(hint_CMD):
 			storeMove = session->slot[session->currentGame]->hint();
 			if (storeMove != nullptr){
 				std::cout << "From: " << storeMove->from << "\n";
 				std::cout << "To: " << storeMove->to << "\n";
 				storeMove->card->printCard();
+				std::cout << "Turned up card: " << storeMove->turnedUp << "\n";
 				delete(storeMove->card);
 				delete(storeMove);
 			}
@@ -222,7 +224,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 
 	return 0;
 }
-
+// TODO shuffle is commented !!
 int createGame(session_t *session){
 	Game* newGame = new Game();
 	int pos;
@@ -230,7 +232,7 @@ int createGame(session_t *session){
 		return -1;
 	}
 
-
+	count_cards_end_game = 0;
 	Color clr;
 	for (int i =0; i < 4; i++){
 		clr = static_cast<Color> (i);
@@ -244,15 +246,15 @@ int createGame(session_t *session){
 	std::srand ( unsigned ( std::time(0) ) );
 	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 
-	newGame->decks[12] = new Deck (insert, flipDeck, 12);
-	newGame->decks[11] = new Deck (get, flopDeck, 11);
+	newGame->decks[12] = new Deck (insert, waste, 12);
+	newGame->decks[11] = new Deck (get, stack, 11);
 
 	for(int i = 4; i < 11; i++){
-		newGame->decks[i] = new Deck(insert_get,starterDeck, i);
+		newGame->decks[i] = new Deck(insert_get,pileau, i);
 	}
 
 	for(int i = 0; i < 4; i++){
-		newGame->decks[i] = new Deck(insert_get,finalDeck, i);
+		newGame->decks[i] = new Deck(insert_get,foundation, i);
 	}
 
 	// shuffle one more time to get more random shuffeled cards
