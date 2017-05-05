@@ -282,27 +282,34 @@ void Game::showGame(){
 
 // TODO dokoncit
 Move* Game::hint(){
-	Card cardFrom, cardTo;
+	Card cardFrom;
 	int result;
 	Move *hintMove = nullptr;
 
 	for (int i = 0; i < 12; ++i){
+		// is there any card?
 		if (!this->decks[i]->cards.empty())
 			cardFrom = this->decks[i]->cards.back();
-		if (!this->decks[i+1]->cards.empty())
-			cardTo = this->decks[i+1]->cards.back();
-
-		if (cardFrom.number == 0)
+		else
 			continue;
-		// FIXME go trough all visible cards in one deck
-		for (int j = 0;j < 12;++j){
-			result = this->decks[j]->checkValidity(cardFrom);
-			if (result == 0){
-				Card *store = new Card(cardFrom);
-				hintMove = new Move({i,j,store,false});
-				break;
+		// is card valid? , iterate trough vector
+		if (cardFrom.number == 0 || cardFrom.visible == false)
+			continue;
+		for (std::vector<Card>::iterator it = this->decks[i]->cards.end();
+			it != this->decks[i]->cards.begin(); --it){
+			if ((*it).visible == false)
+				continue;
+			for (int j = 0;j < 12;++j){
+				result = this->decks[j]->checkValidity(*it);
+				if (result == 0){
+					Card *store = new Card(*it);
+					hintMove = new Move({i,j,store,false});
+					break;
+				}
 			}
+
 		}
+
 		if (hintMove != nullptr)
 			return hintMove;
 	}
