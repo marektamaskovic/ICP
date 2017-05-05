@@ -106,6 +106,8 @@ inline std::string getCommandName(command_n a){
 int createGame(session_t *);
 command_t *parseCMD(std::string&);
 int resolveCmd(session_t *, std::string&);
+void moveCardDeco(command_t *, session_t *);
+void quitGameDeco(session_t *);
 
 
 #endif

@@ -121,10 +121,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			  << "'"
 			  << std::endl;
 
-	int num, deckNumber , historyNumber;
-	std::vector<Card> vectCard;
-	Card *pushCard = nullptr;
-	Deck *tmpDeck = nullptr;
+	int num;
 	Move *storeMove = nullptr;
 	switch(cmd->type){
 		case(createG_CMD):
@@ -155,12 +152,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			load_game(cmd->args.front(), session);
 			break;
 		case(quit_CMD):
-			for(int i = 0; i < 4; ++i){
-				if (session->openSlot[i] == true){
-					clearHistory(session->slot[session->currentGame]->history);
-					delete session->slot[i];
-				}
-			}
+			quitGameDeco(session);
 			delete(cmd);
 			exit(0);
 			break;
@@ -168,37 +160,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			session->slot[session->currentGame]->decks[12]->dequeue(session->slot[session->currentGame]->decks[11]);
 			break;
 		case(moveCard_CMD):
-			if (cmd->args.size() > 1 && session->currentGame != -1){
-				vectCard = parseCard(cmd->args[1], &deckNumber);
-				if (vectCard.size() == 0)
-					break;
-				tmpDeck = parseDeck(cmd->args[0]);
-				historyNumber = tmpDeck->deck;
-				num = tmpDeck->moveCards(vectCard);
-				/* Remove all cards that was swapped */
-				if (num != -1){
-					tmpDeck=session->slot[session->currentGame]->decks[deckNumber];
-					for (unsigned j = 0; j < tmpDeck->cards.size();++j){
-						if (tmpDeck->cards[j] == vectCard.back()){
-							for (unsigned i = j; i < (j + vectCard.size());++i){
-								tmpDeck->cards.erase(tmpDeck->cards.begin()+i);
-							}
-						}
-					}
-					pushCard = new Card(vectCard.front());
-					if (tmpDeck->cards.size() != 0){
-
-						if (tmpDeck->cards.back().visible == false){
-							session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
-							tmpDeck->cards.back().changeVisibility();
-						}
-						else
-							session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
-					}else {
-						session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,true});
-					}
-				}
-			}
+			moveCardDeco(cmd, session);
 			break;
 		case(undo_CMD):
 			session->slot[session->currentGame]->history = undo(session->slot[session->currentGame]->history);
@@ -210,7 +172,6 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 				std::cout << "From: " << storeMove->from << "\n";
 				std::cout << "To: " << storeMove->to << "\n";
 				storeMove->card->printCard();
-				std::cout << "Turned up card: " << storeMove->turnedUp << "\n";
 				delete(storeMove->card);
 				delete(storeMove);
 			}
@@ -242,9 +203,10 @@ int createGame(session_t *session){
 		}
 	}
 	/* Game will create all decks at first not filled with cards */
-	//shuffling cards
 	std::srand ( unsigned ( std::time(0) ) );
-	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
+#ifdef SHUFFLE
+	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
+#endif
 
 	newGame->decks[12] = new Deck (insert, waste, 12);
 	newGame->decks[11] = new Deck (get, stack, 11);
@@ -252,13 +214,10 @@ int createGame(session_t *session){
 	for(int i = 4; i < 11; i++){
 		newGame->decks[i] = new Deck(insert_get,pileau, i);
 	}
-
 	for(int i = 0; i < 4; i++){
 		newGame->decks[i] = new Deck(insert_get,foundation, i);
 	}
 
-	// shuffle one more time to get more random shuffeled cards
-	// std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 	for (int j = 4; j < 11; j++){
 
 		for (int i = 4; i <= j; i++){
@@ -283,4 +242,52 @@ int createGame(session_t *session){
 			  << "!."
 			  << std::endl;
 	return 0;
+}
+
+void moveCardDeco(command_t *cmd, session_t *session){
+	std::vector<Card> vectCard;
+	int num, deckNumber , historyNumber;
+	Card *pushCard = nullptr;
+	Deck *tmpDeck = nullptr;
+
+	if (cmd->args.size() > 1 && session->currentGame != -1){
+		vectCard = parseCard(cmd->args[1], &deckNumber);
+		if (vectCard.size() == 0)
+			return;
+		tmpDeck = parseDeck(cmd->args[0]);
+		historyNumber = tmpDeck->deck;
+		num = tmpDeck->moveCards(vectCard);
+		/* Remove all cards that was swapped */
+		if (num != -1){
+			tmpDeck=session->slot[session->currentGame]->decks[deckNumber];
+			for (unsigned j = 0; j < tmpDeck->cards.size();++j){
+				if (tmpDeck->cards[j] == vectCard.back()){
+					for (unsigned i = j; i < (j + vectCard.size());++i){
+						tmpDeck->cards.erase(tmpDeck->cards.begin()+i);
+					}
+				}
+			}
+			pushCard = new Card(vectCard.front());
+			if (tmpDeck->cards.size() != 0){
+
+				if (tmpDeck->cards.back().visible == false){
+					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
+					tmpDeck->cards.back().changeVisibility();
+				}
+				else
+					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
+			}else {
+				session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,true});
+			}
+		}
+	}
+}
+
+void quitGameDeco(session_t *session){
+	for(int i = 0; i < 4; ++i){
+		if (session->openSlot[i] == true){
+			clearHistory(session->slot[session->currentGame]->history);
+			delete session->slot[i];
+		}
+	}
 }
