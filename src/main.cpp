@@ -5,6 +5,11 @@
  *          xvasko12 - Vaško Martin
  */
 
+/*
+ *  Used JSON library:
+ *  https://github.com/nlohmann/json#license
+ */
+
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -18,10 +23,19 @@
 #include "json.hpp"
 // #include <ncurses.h> // Link \w -lncurses
 
-/*
- *  Used JSON library:
- *  https://github.com/nlohmann/json#license
- */
+#define GUI
+
+#ifdef GUI
+
+#include <QApplication>
+
+#include "table.h"
+#include "mainwindow.h"
+
+#endif
+
+
+
 
 extern int position[];
 extern int count_cards_end_game;
@@ -33,6 +47,7 @@ int main(int argc, char *argv[]){
 	static_cast<void> (argc);
 	static_cast<void> (argv);
 
+#ifndef GUI
 	std::string cmdBuffer = "";
 
 	std::cout << ">>> ";
@@ -62,5 +77,45 @@ int main(int argc, char *argv[]){
 		std::cout << std::endl;
 	}
 
-	return 0;
+    return 0;
+#else
+
+    QApplication klondike(argc, argv);
+    MainWindow window;
+    window.showMaximized();
+
+    return klondike.exec();
+
+#endif
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
