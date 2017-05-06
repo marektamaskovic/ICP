@@ -23,8 +23,8 @@
 #include "json.hpp"
 // #include <ncurses.h> // Link \w -lncurses
 
-#define GUI
 
+#define GUI
 #ifdef GUI
 
 #include <QApplication>

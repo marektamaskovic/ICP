@@ -35,23 +35,35 @@ int game_board::update(QVector<QLabel *> *list)
         int j = 0;
         QWidget *w = new QWidget();
         QGridLayout *g = new QGridLayout(w);
-        QSpacerItem *s = new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Expanding);
+        g->setSpacing(-120);
+
         for(auto label = list[i].begin();
             label != list[i].end();
             ++label, ++j)
         {
 //            std::string s = (*label)->text().toStdString();
 //            this->grid->addWidget((*label), j, i, 1, 1);
-            g->addWidget((*label), j, 0, 1, 1);
+            if(i == 12){
+                g->addWidget(list[i].back(), j, 0, 1, 1);
+                break;
+            }
+            else{
+                g->addWidget((*label), j, 0, 1, 1);
+                QSpacerItem *s = new QSpacerItem(10, -120, QSizePolicy::Fixed, QSizePolicy::Fixed);
+                g->addItem(s, ++j, 0, 1, 1);
+            }
         }
+        QSpacerItem *s = new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Expanding);
         g->addItem(s, j, 0, 1, 1);
         w->setLayout(g);
         if(i < 4)
             this->grid->addWidget(w, 0, i + 3, 1, 1);
         else if(i > 3 && i < 11)
             this->grid->addWidget(w, 1, i - 4, 1, 1);
+        else if(i == 11)
+            this->grid->addWidget(w, 0, 1, 1, 1);
         else
-            this->grid->addWidget(w, 0, i - 11, 1, 1);
+            this->grid->addWidget(w, 0, 0, 1, 1);
     }
 
     this->repaint();

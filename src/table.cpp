@@ -168,7 +168,24 @@ QLabel *Table::get_card(Card &c)
     name.append(std::to_string(static_cast<int>(c.color)));
     name.append(std::to_string(c.number));
 
-    QLabel *label = new QLabel(name.data());
+    QLabel *label = new QLabel(/*name.data()*/);
+    std::string style = "background-image:url(':/t/img/cards/";
+    if(c.visible){
+        switch(c.color){
+            case(Club): style.append("C"); break;
+            case(Diamond): style.append("D"); break;
+            case(Spade): style.append("S"); break;
+            case(Heart): style.append("H"); break;
+        }
+        style.append(std::to_string(c.number));
+        style.append(".gif') 0 0 0 0 stretch stretch");
+    }
+    else{
+        style.append("B.png') 0 0 0 0 stretch stretch");
+    }
+    label->setStyleSheet(style.data());
+    label->setMaximumWidth(145);
+    label->setMinimumSize(145, 202);
 
     if(label == nullptr)
     {

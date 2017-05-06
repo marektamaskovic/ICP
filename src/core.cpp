@@ -190,6 +190,7 @@ int createGame(session_t *session){
 	Game* newGame = new Game();
 	int pos;
 	if( (pos = session->addGame(newGame)) < 0){
+        delete newGame;
 		return -1;
 	}
 
