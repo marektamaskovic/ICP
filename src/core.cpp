@@ -74,6 +74,9 @@ command_t* parseCMD(std::string &cmdBuffer){
 	else if(cmdBuffer == "quitGame()"){
 		cmd->type = quitG_CMD;
 	}
+	else if(cmdBuffer == "help()"){
+		cmd->type = help_CMD;
+	}
 	// FIXME 2 variants of moveC()?!? - definitely yes, when we got enough
 	// time do 2 variatnts - decknum, Cardfrom, Cardto, Cardfrom; just parser
 	else if((ret = (sscanf(cmdBuffer.c_str(),"moveC(%10s)",argument))) == 1){
@@ -165,7 +168,6 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 		case(undo_CMD):
 			session->slot[session->currentGame]->history = undo(session->slot[session->currentGame]->history);
 			break;
-		// FIXME hint not all cards are iterated just back / front card
 		case(hint_CMD):
 			storeMove = session->slot[session->currentGame]->hint();
 			if (storeMove != nullptr){
@@ -176,6 +178,9 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 				delete(storeMove);
 			}
 			break;
+		case(help_CMD):
+			printHelpMsg();
+			break;
 		default:
 			std::cout << "Command '" << cmdBuffer << "' is not valid!\n";
 			break;
@@ -185,7 +190,6 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 
 	return 0;
 }
-// TODO shuffle is commented !!
 int createGame(session_t *session){
 	Game* newGame = new Game();
 	int pos;
@@ -290,4 +294,26 @@ void quitGameDeco(session_t *session){
 			delete session->slot[i];
 		}
 	}
+}
+
+void printHelpMsg(){
+	std::cout << "Possible commands you can use in this CLI version are: " << std::endl;
+
+	std::cout <<  "'createGame()'" << std::setw(38) << "- no parameter. Create new game." << std::endl;
+	std::cout <<  "'switchGame(num)'" << std::setw(59) << "- 1 parameter - number. To which game should CLI switch." << std::endl;
+	std::cout <<  "'quitGame()'" << std::setw(42) << "- no parameter. Quits current game" << std::endl;
+	std::cout <<  "'saveGame(fileName)'" << std::setw(49) << "- 1 parameter - string. Saves game in JSON format" << std::endl;
+	std::cout <<  "'loadGame(fileName)'" << std::setw(51) << "- 1 parameter - string. Loads game from JSON format" << std::endl;
+	std::cout <<  "'show()'" << std::setw(81) << "- no parameter. Shows current game status, prints all decks and cards" << std::endl;
+	std::cout <<  "'quit()'" << std::setw(46) << "- no parameter. Quits application." << std::endl;
+	std::cout <<  "'popQD()'" << std::setw(57) << "- no parameter. Pops card from stack to waste." << std::endl;
+	std::cout <<  "'moveC(num,card)'" << std::setw(65) << "- 2 parameters - number and card. Card is - number and colour." << std::endl;
+	std::cout << std::setw(138) <<"- colour should be - S,D,H,C. Number  is from 1 to 13 (for 1 could be also given char 'A', for 11 to 13 - 'J','Q','K')" << std::endl;
+	std::cout << std::setw(56) << "- example of cards: 'AS', '9D', 'KH'" << std::endl;
+	std::cout << std::setw(83) <<"- moveC moves card to deck number - deck number is from 0 to 12" << std::endl;
+	std::cout << std::setw(84) << "- deck numbers - 0-3 foundation, 4-10 pileau, 11 stack, 12 waste" << std::endl;
+	std::cout <<  "'undo()'" << std::setw(62) << "- no parameter - Turn back game state 1 state back" << std::endl;
+	std::cout <<  "'hint()'" << std::setw(102) << "- no parameter - Prints to standard output, where you should put card if you have no clue." << std::endl;
+	std::cout <<  "'help()'" << std::setw(53) << "- no parameter - Prints this long message" << std::endl;
+
 }

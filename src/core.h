@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include "classes.h"
 
 typedef struct{
@@ -38,7 +39,8 @@ typedef enum{
 	popQueueDeck_CMD,
 	moveCard_CMD,
 	undo_CMD,
-	hint_CMD
+	hint_CMD,
+	help_CMD
 } command_n;
 
 typedef struct{
@@ -98,6 +100,9 @@ inline std::string getCommandName(command_n a){
 	case(undo_CMD):
 		return "undo";
 		break;
+	case(help_CMD):
+		return "help";
+		break;
 	default:
 		return "";
 	}
@@ -108,6 +113,6 @@ command_t *parseCMD(std::string&);
 int resolveCmd(session_t *, std::string&);
 void moveCardDeco(command_t *, session_t *);
 void quitGameDeco(session_t *);
-
+void printHelpMsg();
 
 #endif
