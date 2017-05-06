@@ -2,6 +2,7 @@
 #define TABLE_H
 
 #include <QWidget>
+#include <QApplication>
 #include <QVector>
 #include <QLabel>
 #include <QDebug>
@@ -16,6 +17,7 @@
 #include "core.h"
 #include "classes.h"
 #include "save.h"
+#include "game_board.h"
 
 // FIXME to card;
 typedef QVector<QLabel*> deck_ui_t;
@@ -53,6 +55,9 @@ public slots:
     void create_game_slot(void);
     void load_game_slot(void);
     void save_game_slot(void);
+    void hint_slot(void);
+    void undo_slot(void);
+    void quit_game_slot(void);
 };
 
 #endif // TABLE_H

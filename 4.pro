@@ -28,7 +28,8 @@ SOURCES += src/main.cpp\
     src/classes.cpp \
     src/core.cpp \
     src/save.cpp \
-    src/table.cpp
+    src/table.cpp \
+    src/game_board.cpp
 
 HEADERS  += src/mainwindow.h \
     src/classes.h \
@@ -36,11 +37,13 @@ HEADERS  += src/mainwindow.h \
     src/core.h \
     src/json.hpp \
     src/save.h \
-    src/table.h
+    src/table.h \
+    src/game_board.h
 
 FORMS    += src/mainwindow.ui \
     src/ui/klondike.ui \
-    src/table.ui
+    src/table.ui \
+    src/game_board.ui
 
 DISTFILES += \
     src/hra2017 \

@@ -39,13 +39,23 @@ Table::Table(QWidget *parent) :
     connect(save_game_b, SIGNAL (released()), this, SLOT (save_game_slot()));
 
     this->grid->addWidget(undo_b,         0,3,1,1);
+    connect(undo_b, SIGNAL (released()), this, SLOT (undo_slot()));
+
     this->grid->addWidget(hint_b,         0,4,1,1);
+    connect(hint_b, SIGNAL (released()), this, SLOT (hint_slot()));
+
     this->grid->addWidget(quit_game_b,    0,5,1,1);
+    connect(quit_game_b, SIGNAL (released()), this, SLOT (quit_game_slot()));
 
     QSpacerItem *spacer = new QSpacerItem(1, 2, QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->grid->addItem(spacer, 2, 0, 1, 8);
     spacer = new QSpacerItem(1, 2, QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->grid->addItem(spacer, 0, 6, 2, 1);
+
+    game_board *g_board = new game_board(this);
+    g_board->setObjectName("game_board");
+
+    this->grid->addWidget(g_board, 1, 0, 1, 8);
 
     this->setLayout(this->grid);
     ui->setupUi(this);
@@ -60,7 +70,12 @@ Table::~Table()
 
 int Table::update()
 {
-    qDebug() << "Update func";
+    game_board *g = this->findChild<game_board*>("game_board");
+    if(g == nullptr){
+        qDebug() << "alsjdh";
+        return 1;
+    }
+
     int curr_game = currentSession.currentGame;
     Game *game = currentSession.slot[curr_game];
 
@@ -74,22 +89,23 @@ int Table::update()
             this->decks_ui[i].pop_back();
         }
     }
-
-    qDebug() << "prepinam sa na naplnenie";
-
-    for(int i = 0; i < 13; i++)
+    // update decks
+    int k = 0;
+    for(int i = 0; i < 13; i++, k++)
     {
+        int j = 4;
         for(auto card = game->decks[i]->cards.begin();
             card != game->decks[i]->cards.end();
-            card++)
+            card++, j++)
         {
             this->decks_ui[i].push_back(this->get_card(*card));
+//            this->grid->addWidget(this->get_card(*card), j,k,1,1);
         }
         qDebug() << i << " : " << this->decks_ui[i].length();
     }
 
-    this->draw_table();
-
+    g->update(this->decks_ui);
+    g->repaint();
     return 0;
 }
 
@@ -168,7 +184,10 @@ void Table::create_game_slot(void)
     session_id = currentSession.isSpace();
     createGame(&currentSession);
     qDebug() << "currentGame: " << currentSession.currentGame << "\n";
-//    this->update();
+    this->update();
+    this->repaint();
+    qApp->processEvents();
+
 }
 
 void Table::load_game_slot(void)
@@ -184,6 +203,7 @@ void Table::load_game_slot(void)
     std::string a = filename.toStdString();
     load_game(a, &currentSession);
     qDebug() << "Loading game from: " << currentSession.currentGame << "\n";
+    this->update();
 }
 
 void Table::save_game_slot(void)
@@ -209,4 +229,38 @@ void Table::save_game_slot(void)
     save(tmp, *currentSession.slot[session_id]);
 
     return;
+}
+
+void Table::hint_slot()
+{
+    Move *storeMove = currentSession.slot[currentSession.currentGame]->hint();
+    std::string text = "Move from:";
+    text.append(std::to_string(storeMove->from));
+    text.append(" to: ");
+    text.append(std::to_string(storeMove->to));
+    QMessageBox::information(
+        this,
+        tr("Klondike"),
+        tr(text.data()));
+    return;
+}
+
+void Table::undo_slot()
+{
+    if(this->session_id < 0){
+        qDebug() << "UNDO ERROR U FAG!";
+        return;
+    }
+    currentSession.slot[this->session_id]->history = undo(currentSession.slot[this->session_id]->history);
+}
+
+void Table::quit_game_slot()
+{
+    qDebug() << "session_id: " << session_id;
+    if(this->session_id < 0){
+        qDebug() << "QUIT ERROR U FAG!";
+        return;
+    }
+    currentSession.openSlot[this->session_id] = false;
+    delete currentSession.slot[this->session_id];
 }
