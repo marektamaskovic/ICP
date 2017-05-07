@@ -8,9 +8,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     QGridLayout *grid = new QGridLayout();
     grid->setEnabled(true);
-    Table *t = new Table(nullptr);
+    Table *t = new Table(this);
     grid->addWidget(t, 0, 0, 1, 1);
-    Table *tt = new Table(nullptr);
+    Table *tt = new Table(this);
     grid->addWidget(tt, 0, 1, 1, 1);
     Table *ttt = new Table(this);
     grid->addWidget(ttt, 1, 0, 1, 1);

@@ -9,6 +9,7 @@
 #include "ui_table.h"
 #include "core.h"
 #include "classes.h"
+#include "src/mainwindow.h"
 
 extern session_t currentSession;
 
@@ -73,15 +74,15 @@ int Table::update()
         qDebug() << "alsjdh";
         return 1;
     }
-
-    int curr_game = currentSession.currentGame;
+    qDebug() << "updating table no." << session_id;
+    int curr_game = session_id;
     Game *game = currentSession.slot[curr_game];
 
     //clear decks
 
     for(int i = 0; i < 13; i++)
     {
-        qDebug() << "Cleaning deck: " << i;
+//        qDebug() << "Cleaning deck: " << i;
         while(this->decks_ui[i].size() > 0)
         {
             this->decks_ui[i].pop_back();
@@ -99,60 +100,14 @@ int Table::update()
             this->decks_ui[i].push_back(this->get_card(*card));
 //            this->grid->addWidget(this->get_card(*card), j,k,1,1);
         }
-        qDebug() << i << " : " << this->decks_ui[i].length();
+//        qDebug() << i << " : " << this->decks_ui[i].length();
     }
 
     g->update(this->decks_ui);
     g->repaint();
-    return 0;
-}
-
-int Table::draw_table()
-{
-    qDebug() << "Draw table func";
-    QGridLayout *game_board = this->findChild<QGridLayout*>("game_board");
-
-    if(game_board == nullptr){
-        qDebug() << "returnujem";
-        return 1;
-    }
-    // Remove all widgets on table
-    for(int idx = 0; idx < game_board->count(); ++idx)
-    {
-        QLayoutItem *item = game_board->itemAt(idx);
-        delete item->widget();
-    }
-
-    delete game_board;
-    game_board = new QGridLayout();
-
-    qDebug() << "blabla";
-
-    // Create all cards
-    for(int i = 0; i < 13; i++)
-    {
-        qDebug() << "deck" << i << "\n";
-        QGridLayout *deck = new QGridLayout();
-        deck->expandingDirections();
-        int j = 0;
-        for(auto label = decks_ui[i].begin();
-            label != decks_ui[i].end();
-            ++label, ++j)
-        {
-            deck->addWidget(*label, j, 0, 1, 1);
-        }
-
-        if(i < 4)
-            game_board->addItem(deck, i + 3, 0, 1, 1);
-        else if( i > 4 && i < 10)
-            game_board->addItem(deck, i - 4, 1, 1, 1);
-        else
-            game_board->addItem(deck, i-11, 0, 1, 1);
-    }
-
-    this->grid->addItem(game_board, 1, 0, 1, 8);
-    ui->setupUi(this);
-    
+    this->repaint();
+    reinterpret_cast<MainWindow*>(parent())->repaint();
+//    game->showGame();
     return 0;
 }
 
@@ -163,9 +118,22 @@ QPushButton *Table::get_card(Card &c)
 
     std::string name = "";
 
-    c.visible ? name.append("V") : name.append("N");
-    name.append(std::to_string(static_cast<int>(c.color)));
+//    c.visible ? name.append("V") : name.append("N");
     name.append(std::to_string(c.number));
+    switch(c.color){
+    case(Club):
+        name.append("C");
+        break;
+    case(Diamond):
+        name.append("D");
+        break;
+    case(Spade):
+        name.append("S");
+        break;
+    case(Heart):
+        name.append("H");
+        break;
+    }
 
     QPushButton *label = new QPushButton(name.data());
 
@@ -205,7 +173,7 @@ void Table::create_game_slot(void)
     }
     session_id = currentSession.isSpace();
     createGame(&currentSession);
-    qDebug() << "currentGame: " << currentSession.currentGame << "\n";
+    qDebug() << "currentGame: " << currentSession.currentGame << " : " << session_id;
     this->update();
     this->repaint();
     qApp->processEvents();

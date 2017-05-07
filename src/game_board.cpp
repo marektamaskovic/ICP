@@ -1,10 +1,11 @@
 #include "src/game_board.h"
 #include "ui_game_board.h"
 
+
 extern session_t currentSession;
 
 int game_board::a = 0;
-QVector<QString> NEXT_MOVE;
+
 
 game_board::game_board(QWidget *parent) :
     QWidget(parent),
@@ -18,6 +19,7 @@ game_board::game_board(QWidget *parent) :
     this->grid = new QGridLayout();
     this->setLayout(grid);
     ui->setupUi(this);
+
 }
 
 game_board::~game_board()
@@ -29,12 +31,15 @@ game_board::~game_board()
 
 int game_board::update(QVector<QPushButton *> *list)
 {
-    qDebug() << "g->update : " << this->id ;
+    delete this->grid;
+    this->grid = new QGridLayout();
+//    qDebug() << "g->update : " << this->id ;
     for(int i = 0; i < 13; i++)
     {
-        qDebug() << "deck" << i << "\n";
+//        qDebug() << "deck" << i << "\n";
         int j = 0;
         QWidget *w = new QWidget();
+        w->setStyleSheet("background-image: url(:/t/img/pool_table/pool_table.png);");
         QVBoxLayout *g = new QVBoxLayout(w);
         g->setSpacing(0);
 
@@ -43,26 +48,38 @@ int game_board::update(QVector<QPushButton *> *list)
             label != list[i].end();
             ++label, ++j)
         {
-            connect(*label, SIGNAL (released()), this, SLOT(send_card()));
             if(i == 12){
-                g->addWidget(list[i].back());
+                auto label = list[i].back();
+                connect(label, SIGNAL (released()), this, SLOT(waste_card()));
+                g->addWidget(label);
                 break;
             }
             else{
                 g->addWidget((*label));
-                QSpacerItem *s = new QSpacerItem(10, -160, QSizePolicy::Fixed, QSizePolicy::Fixed);
+                connect(*label, SIGNAL (released()), this, SLOT(send_card()));
+                QSpacerItem *s;
+                if( i < 4 || i == 11)
+                    s = new QSpacerItem(10, -202, QSizePolicy::Fixed, QSizePolicy::Fixed);
+                else
+                    s = new QSpacerItem(10, -160, QSizePolicy::Fixed, QSizePolicy::Fixed);
                 if(++label != list[i].end())
                     g->addItem(s);
                 label--;
             }
         }
         if (list[i].size() == 0){
-            qDebug() << "foundation-bg: " << i;
+//            qDebug() << "foundation-bg: " << i;
             QPushButton *label = new QPushButton();
+            if(i==12)
+                connect(label, SIGNAL (released()), this, SLOT(waste_card()));
+            else
+                connect(label, SIGNAL (released()), this, SLOT(send_card()));
             std::string style = "background-image: url(:/img/cards/foundation.png);";
             label->setStyleSheet(style.data());
             label->setMaximumWidth(145);
             label->setMinimumSize(145, 202);
+            std::string s = "e" + std::to_string(i);
+            label->setText(QString::fromStdString(s));
             g->addWidget(label);
         }
         QSpacerItem *s = new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -77,7 +94,7 @@ int game_board::update(QVector<QPushButton *> *list)
         else
             this->grid->addWidget(w, 0, 0, 1, 1);
     }
-
+    this->setLayout(grid);
     this->repaint();
 
 
@@ -88,7 +105,7 @@ int game_board::update(QVector<QPushButton *> *list)
 void game_board::send_card()
 {
     const QString s = reinterpret_cast<QPushButton*>(sender())->text();
-    qDebug() << "card_chosesn: " << s;
+    qDebug() << "card_chosen: " << s;
     NEXT_MOVE.push_back(s);
 
     if(NEXT_MOVE.size() == 2){
@@ -96,13 +113,75 @@ void game_board::send_card()
             qDebug() << "successfuly moved cards!";
         else
             qDebug() << "can't move this cards!";
+        reinterpret_cast<Table*>(parent())->update();
     }
 }
 
+void game_board::waste_card()
+{
+    qDebug() << "waste_card()";
+    int curr_id = reinterpret_cast<Table*>(parent())->session_id;
+    currentSession.slot[curr_id]->decks[12]->dequeue(currentSession.slot[curr_id]->decks[11]);
+    reinterpret_cast<Table*>(parent())->update();
+    return;
+}
 
-int q_move_card(){
 
+int game_board::q_move_card(){
+    command_t *cmd = new command_t;
+
+    std::string deck;
+    if(NEXT_MOVE.back()[0] == 'e')
+        deck = NEXT_MOVE.back().toStdString().substr(1);
+    else
+        deck = find_card_in_deck(NEXT_MOVE.back());
+    if(deck == "not_found"){
+        return 1;
+    }
+
+    cmd->type = moveCard_CMD;
+    cmd->args.push_back(deck);
+    cmd->args.push_back(NEXT_MOVE.front().toStdString());
+
+    moveCardDeco(cmd);
+    // update();
+    NEXT_MOVE.pop_back();
+    NEXT_MOVE.pop_back();
     return 0;
+}
+
+std::string game_board::find_card_in_deck(QString &s){
+
+    int game_id = reinterpret_cast<Table*>(parent())->session_id;
+
+    for(int i = 0; i < 13; i++){
+        for(unsigned card_ind = 0;
+            card_ind != currentSession.slot[game_id]->decks[i]->cards.size();
+            card_ind++)
+        {
+            Card c = currentSession.slot[game_id]->decks[i]->cards[card_ind];
+            std::string text = std::to_string(c.number);
+            switch(c.color){
+            case(Club):
+                text.append("C");
+                break;
+            case(Diamond):
+                text.append("D");
+                break;
+            case(Spade):
+                text.append("S");
+                break;
+            case(Heart):
+                text.append("H");
+                break;
+            }
+            if(!std::strcmp(text.c_str(), s.toStdString().c_str())){
+                return std::to_string(i);
+            }
+        }
+    }
+
+    return "not_found";
 }
 
 

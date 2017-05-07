@@ -163,7 +163,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			session->slot[session->currentGame]->decks[12]->dequeue(session->slot[session->currentGame]->decks[11]);
 			break;
 		case(moveCard_CMD):
-			moveCardDeco(cmd, session);
+            moveCardDeco(cmd);
 			break;
 		case(undo_CMD):
 			session->slot[session->currentGame]->history = undo(session->slot[session->currentGame]->history);
@@ -209,6 +209,7 @@ int createGame(session_t *session){
 	}
 	/* Game will create all decks at first not filled with cards */
 	std::srand ( unsigned ( std::time(0) ) );
+#define SHUFFLE
 #ifdef SHUFFLE
 	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
 #endif
@@ -249,13 +250,13 @@ int createGame(session_t *session){
 	return 0;
 }
 
-void moveCardDeco(command_t *cmd, session_t *session){
+void moveCardDeco(command_t *cmd){
 	std::vector<Card> vectCard;
 	int num, deckNumber , historyNumber;
 	Card *pushCard = nullptr;
 	Deck *tmpDeck = nullptr;
 
-	if (cmd->args.size() > 1 && session->currentGame != -1){
+	if (cmd->args.size() > 1 && currentSession.currentGame != -1){
 		vectCard = parseCard(cmd->args[1], &deckNumber);
 		if (vectCard.size() == 0)
 			return;
@@ -264,7 +265,7 @@ void moveCardDeco(command_t *cmd, session_t *session){
 		num = tmpDeck->moveCards(vectCard);
 		/* Remove all cards that was swapped */
 		if (num != -1){
-			tmpDeck=session->slot[session->currentGame]->decks[deckNumber];
+			tmpDeck=currentSession.slot[currentSession.currentGame]->decks[deckNumber];
 			for (unsigned j = 0; j < tmpDeck->cards.size();++j){
 				if (tmpDeck->cards[j] == vectCard.back()){
 					for (unsigned i = j; i < (j + vectCard.size());++i){
@@ -276,13 +277,13 @@ void moveCardDeco(command_t *cmd, session_t *session){
 			if (tmpDeck->cards.size() != 0){
 
 				if (tmpDeck->cards.back().visible == false){
-					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
+					currentSession.slot[currentSession.currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
 					tmpDeck->cards.back().changeVisibility();
 				}
 				else
-					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
+					currentSession.slot[currentSession.currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
 			}else {
-				session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,true});
+				currentSession.slot[currentSession.currentGame]->history.push_back({deckNumber,historyNumber,pushCard,true});
 			}
 		}
 	}
