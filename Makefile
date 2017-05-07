@@ -5,7 +5,8 @@
 # Authors: xtamas01 - Tamaškovič Marek                                        #
 #          xvasko12 - Vaško Martin                                            #
 # Makefile supports various types of architectures, machines and much more... #
-# supports commands: make, make clean, make gui, make cli, make zip, make run #
+# supports commands:  make, make clean, make gui, make cli, make run					#
+#											make doxygen, make pack																	#
 ###############################################################################
 
 #variables of compilation
@@ -44,16 +45,15 @@ travis_compile:
 	@cd src/ && $(MAKE) hra2017-cli-tr
 	cp src/hra2017-cli ./hra2017-cli
 
-#FIXME, run CLI or GUI?
 run:
-	./hra2017-cli < ./examples/popQ1.txt
+	./hra2017
+	./hra2017-cli
 
-doc:
+doxygen:
 	cd src/ && doxygen doxyfile
 
-#FIXME recursive
-zip: src/* examples/* doc/ Makefile README.txt
-	zip xvasko12_xtamas01.zip -r $^
+pack: src/* examples/* doc/ Makefile README.txt
+	zip -r -9 xvasko12_xtamas01.zip $^
 
 #FIXME doxygen doxyfile
 clean:

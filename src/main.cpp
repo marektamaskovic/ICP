@@ -5,13 +5,8 @@
  *          xvasko12 - Vaško Martin
  */
 
-#include <string>
-#include <iostream>
-#include <iomanip>
 #include <cstdio>
 #include <cstdlib>
-#include <algorithm>
-#include <vector>
 
 #include "core.h"
 #include "classes.h"

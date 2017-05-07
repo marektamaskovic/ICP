@@ -1,5 +1,5 @@
-createGame()
-popQD()
-popQD()
-show()
-quit()
+createGame
+popQD
+popQD
+show
+quit

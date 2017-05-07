@@ -5,9 +5,6 @@
  *          xvasko12 - Vaško Martin
  */
 
-
-#include <iostream>
-
 #include "core.h"
 #include "classes.h"
 #include "color.h"
@@ -53,28 +50,28 @@ command_t* parseCMD(std::string &cmdBuffer){
 
 	char argument[42];
 	int ret;
-	if(cmdBuffer == "show()"){
+	if(cmdBuffer == "show"){
 		cmd->type = show_CMD;
 	}
-	else if(cmdBuffer == "popQD()"){
+	else if(cmdBuffer == "popQD"){
 		cmd->type = popQueueDeck_CMD;
 	}
-	else if(cmdBuffer == "undo()"){
+	else if(cmdBuffer == "undo"){
 		cmd->type = undo_CMD;
 	}
-	else if (cmdBuffer == "hint()"){
+	else if (cmdBuffer == "hint"){
 		cmd->type = hint_CMD;
 	}
-	else if(cmdBuffer == "createGame()"){
+	else if(cmdBuffer == "createGame"){
 		cmd->type = createG_CMD;
 	}
-	else if(cmdBuffer == "quit()"){
+	else if(cmdBuffer == "quit"){
 		cmd->type = quit_CMD;
 	}
-	else if(cmdBuffer == "quitGame()"){
+	else if(cmdBuffer == "quitGame"){
 		cmd->type = quitG_CMD;
 	}
-	else if(cmdBuffer == "help()"){
+	else if(cmdBuffer == "help"){
 		cmd->type = help_CMD;
 	}
 	// FIXME 2 variants of moveC()?!? - definitely yes, when we got enough
@@ -142,6 +139,7 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 		case(quitG_CMD):
 			session->openSlot[session->currentGame] = false;
 			delete session->slot[session->currentGame];
+			session->currentGame = -1;
 			break;
 		case(save_CMD):
 			if(session->currentGame >= 0){
@@ -161,12 +159,18 @@ int resolveCmd(session_t *session, std::string &cmdBuffer){
 			break;
 		case(popQueueDeck_CMD):
 			session->slot[session->currentGame]->decks[12]->dequeue(session->slot[session->currentGame]->decks[11]);
+			if (session->currentGame != -1)
+				session->slot[session->currentGame]->showGame();
 			break;
 		case(moveCard_CMD):
-			moveCardDeco(cmd, session);
+			moveCardDeco(cmd);
+			if (session->currentGame != -1)
+				session->slot[session->currentGame]->showGame();
 			break;
 		case(undo_CMD):
 			session->slot[session->currentGame]->history = undo(session->slot[session->currentGame]->history);
+			if (session->currentGame != -1)
+				session->slot[session->currentGame]->showGame();
 			break;
 		case(hint_CMD):
 			storeMove = session->slot[session->currentGame]->hint();
@@ -208,8 +212,8 @@ int createGame(session_t *session){
 	}
 	/* Game will create all decks at first not filled with cards */
 	std::srand ( unsigned ( std::time(0) ) );
-#ifdef SHUFFLE
-	std::random_shuffle(mainDeck.begin(), mainDeck.end(), myrandom);
+#ifndef SHUFFLE
+	std::random_shuffle(newGame->mainDeck.begin(), newGame->mainDeck.end(), myrandom);
 #endif
 
 	newGame->decks[12] = new Deck (insert, waste, 12);
@@ -248,13 +252,13 @@ int createGame(session_t *session){
 	return 0;
 }
 
-void moveCardDeco(command_t *cmd, session_t *session){
+void moveCardDeco(command_t *cmd){
 	std::vector<Card> vectCard;
 	int num, deckNumber , historyNumber;
 	Card *pushCard = nullptr;
 	Deck *tmpDeck = nullptr;
 
-	if (cmd->args.size() > 1 && session->currentGame != -1){
+	if (cmd->args.size() > 1 && currentSession.currentGame != -1){
 		vectCard = parseCard(cmd->args[1], &deckNumber);
 		if (vectCard.size() == 0)
 			return;
@@ -263,7 +267,7 @@ void moveCardDeco(command_t *cmd, session_t *session){
 		num = tmpDeck->moveCards(vectCard);
 		/* Remove all cards that was swapped */
 		if (num != -1){
-			tmpDeck=session->slot[session->currentGame]->decks[deckNumber];
+			tmpDeck=currentSession.slot[currentSession.currentGame]->decks[deckNumber];
 			for (unsigned j = 0; j < tmpDeck->cards.size();++j){
 				if (tmpDeck->cards[j] == vectCard.back()){
 					for (unsigned i = j; i < (j + vectCard.size());++i){
@@ -275,13 +279,13 @@ void moveCardDeco(command_t *cmd, session_t *session){
 			if (tmpDeck->cards.size() != 0){
 
 				if (tmpDeck->cards.back().visible == false){
-					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
+					currentSession.slot[currentSession.currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
 					tmpDeck->cards.back().changeVisibility();
 				}
 				else
-					session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
+					currentSession.slot[currentSession.currentGame]->history.push_back({deckNumber,historyNumber,pushCard,tmpDeck->cards.back().visible});
 			}else {
-				session->slot[session->currentGame]->history.push_back({deckNumber,historyNumber,pushCard,true});
+				currentSession.slot[currentSession.currentGame]->history.push_back({deckNumber,historyNumber,pushCard,true});
 			}
 		}
 	}
@@ -290,7 +294,7 @@ void moveCardDeco(command_t *cmd, session_t *session){
 void quitGameDeco(session_t *session){
 	for(int i = 0; i < 4; ++i){
 		if (session->openSlot[i] == true){
-			clearHistory(session->slot[session->currentGame]->history);
+			clearHistory(session->slot[i]->history);
 			delete session->slot[i];
 		}
 	}
