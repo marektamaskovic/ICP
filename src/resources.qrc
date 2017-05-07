@@ -57,5 +57,7 @@
         <file>img/cards/S9.gif</file>
         <file>img/pool_table/pool_table.png</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>img/cards/foundation.png</file>
+    </qresource>
 </RCC>

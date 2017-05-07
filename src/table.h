@@ -20,7 +20,7 @@
 #include "game_board.h"
 
 // FIXME to card;
-typedef QVector<QLabel*> deck_ui_t;
+typedef QVector<QPushButton*> deck_ui_t;
 
 namespace Ui {
     class Table;
@@ -47,7 +47,7 @@ public:
     deck_ui_t decks_ui[13];
     int session_id = -1;
 private:
-    QLabel *get_card(Card&);
+    QPushButton *get_card(Card&);
     Ui::Table *ui;
     QGridLayout *grid;
     int draw_table(void);

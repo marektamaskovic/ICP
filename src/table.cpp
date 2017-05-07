@@ -2,8 +2,6 @@
  * TODO
  * change enabled to false when you create Table()
  * change enabled of button when you create or load game to active
- * add slot to quit button
- * add slot to hint button
  *
 */
 
@@ -135,6 +133,7 @@ int Table::draw_table()
     {
         qDebug() << "deck" << i << "\n";
         QGridLayout *deck = new QGridLayout();
+        deck->expandingDirections();
         int j = 0;
         for(auto label = decks_ui[i].begin();
             label != decks_ui[i].end();
@@ -157,7 +156,7 @@ int Table::draw_table()
     return 0;
 }
 
-QLabel *Table::get_card(Card &c)
+QPushButton *Table::get_card(Card &c)
 {
     // FIXME only prototype
     // TODO fix QLabel to card object with background
@@ -168,7 +167,14 @@ QLabel *Table::get_card(Card &c)
     name.append(std::to_string(static_cast<int>(c.color)));
     name.append(std::to_string(c.number));
 
-    QLabel *label = new QLabel(/*name.data()*/);
+    QPushButton *label = new QPushButton(name.data());
+
+    if(label == nullptr)
+    {
+        qDebug() << "operator `new` didn't allocate QLabel in function `table::get_card`\n";
+        //TODO clean up and exit
+    }
+
     std::string style = "background-image:url(':/t/img/cards/";
     if(c.visible){
         switch(c.color){
@@ -187,17 +193,16 @@ QLabel *Table::get_card(Card &c)
     label->setMaximumWidth(145);
     label->setMinimumSize(145, 202);
 
-    if(label == nullptr)
-    {
-        qDebug() << "operator `new` didn't allocate QLabel in function `table::get_card`\n";
-        //TODO clean up and exit
-    }
     return label;
 }
 
 void Table::create_game_slot(void)
 {
     // TODO add show game
+    if(session_id >= 0){
+        qDebug() << "Can't create new game! You have to quit the actual one to create a new one on this place.";
+        return;
+    }
     session_id = currentSession.isSpace();
     createGame(&currentSession);
     qDebug() << "currentGame: " << currentSession.currentGame << "\n";
