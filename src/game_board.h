@@ -16,8 +16,8 @@
 #include <QDrag>
 
 #include "table.h"
-#include "src/core.h"
-#include "src/classes.h"
+#include "core.h"
+#include "classes.h"
 
 namespace Ui {
 class game_board;
@@ -37,6 +37,7 @@ public:
     QVector<QString> NEXT_MOVE;
     int q_move_card();
     std::string find_card_in_deck(QString &s);
+    void clean_board();
 
 private:
     Ui::game_board *ui;

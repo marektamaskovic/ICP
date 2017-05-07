@@ -31,16 +31,18 @@ core.o: core.h core.cpp
 classes.o: classes.h classes.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c classes.cpp -o $@
 
-hra2017: main.o $(DEPS)
+hra2017:
 	@echo -e "$(GREEN)=== Building GUI $(NC)"
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< $(DEPS) -o $@
-hra2017-cli: main.o $(DEPS)
+	qmake 4.pro -o qmakefile
+	make -f qmakefile
+hra2017-cli:$(DEPS)
 	@echo -e "$(GREEN)=== Building CLI $(NC)"
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $< $(DEPS) -o $@
+	$(CXX) -c $(CXXFLAGS) $(LDFLAGS) -DNGUI main.cpp -o main.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) main.o $(DEPS) -o $@
 
 hra2017-cli-tr: CXX=g++-6
 hra2017-cli-tr: hra2017-cli
 
 clean:
 	@echo -e "$(RED)cleaning like mexican cleaning lady $(NC)"
-	rm $(BIN) *.o
+	rm $(BIN) *.o qrc* moc_* ui_*.h qmakefile

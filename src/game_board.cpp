@@ -1,4 +1,4 @@
-#include "src/game_board.h"
+#include "game_board.h"
 #include "ui_game_board.h"
 
 
@@ -104,6 +104,10 @@ int game_board::update(QVector<QPushButton *> *list)
 
 void game_board::send_card()
 {
+    if(reinterpret_cast<Table*>(parent())->session_id < 0){
+        qDebug() << "SEND CARD ERROR U FAG";
+        return;
+    }
     const QString s = reinterpret_cast<QPushButton*>(sender())->text();
     qDebug() << "card_chosen: " << s;
     NEXT_MOVE.push_back(s);
@@ -119,6 +123,10 @@ void game_board::send_card()
 
 void game_board::waste_card()
 {
+    if(reinterpret_cast<Table*>(parent())->session_id < 0){
+        qDebug() << "WASTE CARD ERROR U FAG";
+        return;
+    }
     qDebug() << "waste_card()";
     int curr_id = reinterpret_cast<Table*>(parent())->session_id;
     currentSession.slot[curr_id]->decks[12]->dequeue(currentSession.slot[curr_id]->decks[11]);
@@ -182,6 +190,20 @@ std::string game_board::find_card_in_deck(QString &s){
     }
 
     return "not_found";
+}
+
+void game_board::clean_board()
+{
+    delete this->grid;
+    this->grid = new QGridLayout();
+    QWidget *w = new QWidget();
+    w->setStyleSheet("background-image: url(:/t/img/pool_table/pool_table.png);");
+    QVBoxLayout *g = new QVBoxLayout(w);
+    QSpacerItem *s = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
+    g->addItem(s);
+    this->grid->addWidget(w, 0, 0, 8, 8);
+    return;
+
 }
 
 

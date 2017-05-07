@@ -214,7 +214,6 @@ int createGame(session_t *session){
 	/* Game will create all decks at first not filled with cards */
 	std::srand ( unsigned ( std::time(0) ) );
 
-#define SHUFFLE
 #ifndef SHUFFLE
 	std::random_shuffle(newGame->mainDeck.begin(), newGame->mainDeck.end(), myrandom);
 #endif

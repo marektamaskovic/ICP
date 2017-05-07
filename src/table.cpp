@@ -9,7 +9,7 @@
 #include "ui_table.h"
 #include "core.h"
 #include "classes.h"
-#include "src/mainwindow.h"
+#include "mainwindow.h"
 
 extern session_t currentSession;
 
@@ -18,7 +18,7 @@ Table::Table(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Table)
 {
-
+    this->setObjectName("table");
     this->grid = new QGridLayout(this);
 
     QPushButton *new_game_b     = new QPushButton("New Game");
@@ -77,7 +77,7 @@ int Table::update()
     qDebug() << "updating table no." << session_id;
     int curr_game = session_id;
     Game *game = currentSession.slot[curr_game];
-
+    currentSession.currentGame = session_id;
     //clear decks
 
     for(int i = 0; i < 13; i++)
@@ -223,6 +223,11 @@ void Table::save_game_slot(void)
 
 void Table::hint_slot()
 {
+    if(this->session_id < 0){
+        qDebug() << "HINT ERROR U FAG!";
+        return;
+    }
+
     Move *storeMove = currentSession.slot[currentSession.currentGame]->hint();
     std::string text = "Move from:";
     text.append(std::to_string(storeMove->from));
@@ -242,6 +247,9 @@ void Table::undo_slot()
         return;
     }
     currentSession.slot[this->session_id]->history = undo(currentSession.slot[this->session_id]->history);
+    this->update();
+    this->repaint();
+    qApp->processEvents();
 }
 
 void Table::quit_game_slot()
@@ -253,4 +261,9 @@ void Table::quit_game_slot()
     }
     currentSession.openSlot[this->session_id] = false;
     delete currentSession.slot[this->session_id];
+    session_id = -1;
+
+    game_board *g = this->findChild<game_board*>("game_board");
+    g->clean_board();
+    this->repaint();
 }

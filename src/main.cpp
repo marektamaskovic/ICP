@@ -13,9 +13,8 @@
 #include "json.hpp"
 // #include <ncurses.h> // Link \w -lncurses
 
-
-#define GUI
-#ifdef GUI
+// #define NGUI
+#ifndef NGUI
 
 #include <QApplication>
 
@@ -37,7 +36,7 @@ int main(int argc, char *argv[]){
 	static_cast<void> (argc);
 	static_cast<void> (argv);
 
-#ifndef GUI
+#ifdef NGUI
 	std::string cmdBuffer = "";
 
 	std::cout << ">>> ";
