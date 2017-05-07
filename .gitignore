@@ -2,4 +2,4 @@ CppCoreGuidelines_CppCoreGuidelines.pdf
 *.o
 *.pdf
 *hra2017*
-
+/doc/*

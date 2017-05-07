@@ -14,6 +14,9 @@
 #include <iomanip>
 #include "classes.h"
 
+/**
+ * session structure which holds CLI and GUI games, open games and its methods
+ */
 typedef struct{
 	// public attributes
 	class Game* slot[4];
@@ -43,15 +46,21 @@ typedef enum{
 	help_CMD
 } command_n;
 
+/**
+ * command holds type of command and arguments
+ */
 typedef struct{
-	command_n type = no_CMD;
-	std::vector<std::string> args {};
+	command_n type = no_CMD; /**< command type. */
+	std::vector<std::string> args {}; /**< vector of string arguments. When command type expect argument, vector is filled with content. */
 } command_t;
 
 
 static int position[] = {0, 0, 0, 0};
 
-
+/**
+ * @return position of current game.
+ * When game exists returns position else return -1 as fail.
+ */
 inline int getPosition(void){
 	for (int i = 0; i < 4; i++)
 	{
@@ -61,7 +70,10 @@ inline int getPosition(void){
 
 	return -1;
 }
-
+/**
+ * @return string which is simillar to type of command.
+ * Function to print command name.
+ */
 inline std::string getCommandName(command_n a){
 	switch(a){
 	case(no_CMD):
@@ -108,11 +120,43 @@ inline std::string getCommandName(command_n a){
 	}
 }
 
+/**
+ * @param session to which should be created Game added
+ * @see session_t
+ * @return 0 if Game was created else -1 when Game could not be added to session.
+ * creates game with 52 cards and deals it on decks, add to session.
+ */
 int createGame(session_t *);
+/**
+ * @param string from standard input which should be parsed
+ * @return command allocated on heap filled with parsed components.
+ * @see command_t
+ * Parse CMD defined by input param string. As return is filled, command could be used for various thing.
+ */
 command_t *parseCMD(std::string&);
+/**
+ * @param session to which should be resolved Command.
+ * @param string which is given to parseCMD function.
+ * @see parseCMD.
+ * @return 0.
+ * When command resolvation was successful or unsuccessful but when resolvation of command is unsuccessful error to std::cout is written.
+ */
 int resolveCmd(session_t *, std::string&);
+
+/**
+ * @param command where are stored arguments and type is moveCard_CMD.
+ * @see moveCards.
+ * Function parse arguments and create from that vector of Cards and Deck, which is processed to deck method deck->moveCards.
+ */
 void moveCardDeco(command_t *);
+/**
+ * @param session which should be closed
+ * Quit games in CLI version by command name 'quit()'
+ */
 void quitGameDeco(session_t *);
+/**
+ * Prints all commands that are available to use in this application in CLI version
+ */
 void printHelpMsg();
 
 #endif

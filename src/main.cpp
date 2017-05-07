@@ -5,18 +5,8 @@
  *          xvasko12 - Vaško Martin
  */
 
-/*
- *  Used JSON library:
- *  https://github.com/nlohmann/json#license
- */
-
-#include <string>
-#include <iostream>
-#include <iomanip>
 #include <cstdio>
 #include <cstdlib>
-#include <algorithm>
-#include <vector>
 
 #include "core.h"
 #include "classes.h"

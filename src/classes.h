@@ -14,12 +14,25 @@
 #include <cstdlib>      // std::rand, std::srand
 #include "core.h"
 
+/**
+ * enum which converts number of card to name ( based on real Cards )
+ */
 enum Symbol{A=1,J=11,Q,K,undef};
+/**
+ * enum colors of cards
+ */
 enum Color{Heart,Spade,Diamond,Club};
-
+/**
+ * Position of deck in game
+ */
 enum Position{stack=1, waste, pileau, foundation};
+/**
+ * Permissions of deck in game
+ */
 enum Permissions{insert=1, get, insert_get};
-// TODO Doxygen
+/**
+ * number of turned face up cards
+ */
 extern int count_cards_end_game;
 
 
@@ -27,29 +40,40 @@ class Card;
 class Game;
 class Deck;
 class ICommand;
-
+/**
+ * public stucture where is stored Move - used for undo functionality and for
+ * hint. Hint does not need turnedUp attribute so it is ignored.
+ */
 typedef struct {
-	int from;
-	int to;
-	Card *card;
-	bool turnedUp;
+	int from; 		///< from which deck is Card taken
+	int to;			///< to which deck is Card given
+	Card *card;		///< Card which should be taken
+	bool turnedUp;	///< Card before should be turnedUp or not
 }Move;
 
+/**
+ * Card class, attributes are modeling real Card and some abstraction methods.
+ * @see Color
+ * @see Symbol
+ */
 class Card final{
 private:
-	void printColor(std::string);
-	void printColor(int);
+	void printColor(std::string);	///< print color by given name
+	void printColor(int);			///< print color by given number
 public:
-	bool operator==(const Card&);
-	int number;
-	Color color;
-	bool visible;
+	bool operator==(const Card&);	///< overload operator == with 2 cards
+	int number;						///< number of card from 1 to 13
+	Color color;					///< color of card defined by enum
+	bool visible;					///< visibility of card
 
-	Card();
-	Card(const Card &);
-	Card(int ,Color);
-	Card(int ,Color, bool);
-	void printCard();
+	Card();							///< empty constructor
+	Card(const Card &);				///< copy constructor of card
+	Card(int ,Color);				///< implicit false visibility
+	Card(int ,Color, bool);			///< full constructor
+	void printCard();				///< prints Card to std::cout
+	/**
+	 * change visibility of given card to negated visibility of given card.
+	 */
 	inline void changeVisibility(){
 		this->visible = !this->visible;
 		if (this->visible == true) { ++count_cards_end_game; }
@@ -57,31 +81,46 @@ public:
 	};
 };
 
+/**
+ * Game class which holds entire Game - mulptiple games, decks and history.
+ */
 class Game {
 // friend class Deck;
-/* 11 = flop deck
- * 12 = flip deck
- * 0-3 finalDecks
- * 4-10 for starterDecks
- */
+/* */
 public:
-	std::vector<Move> history;
-	std::vector<Card> mainDeck;
+	std::vector<Move> history;			///< history of moves
+	std::vector<Card> mainDeck;			///< all cards when dealing to decks
+	/**
+	 * @see deck
+	 * All decks in game
+	 * 11   = flop deck
+	 * 12   = flip deck
+	 * 0-3  = finalDecks
+	 * 4-10 = for starterDecks
+	 */
 	Deck *decks [13];
 	int m = 0;
 
-	Game();
-	Game(const Game &G);
-	Game& operator=(const Game &G);
-	~Game();
-	/* FILE */
-	void showGame();
+	Game();								///< Empty constructor
+	Game(const Game &G);				///< copy constructor of Game
+	Game& operator=(const Game &G);		///< assign operator to copy Game
+	~Game();							///< destructor for all decks
+	void showGame();					///< shows Game status
+	/**
+	 * @return  On success move structure is filled with necessary things else nullptr is returned.
+	 * Method is traversing all decks twice and tries every card to place on
+	 * another.Move filled - from which deck you should put card to which deck
+	 * and which card.
+	 */
 	Move* hint();
+	/**
+	 * @return how many games are created.
+	 */
 	static inline int numberOfGames(){ return current_count; }
-	static int current_count;
+	static int current_count;			///< number of games created.
 private:
-	int id = 0;
-	int position = 0;
+	int id = 0;							///< id of created game.
+	int position = 0;					///< which position game occupies.
 };
 
 class Deck{
