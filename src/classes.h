@@ -33,7 +33,6 @@ enum Permissions{insert=1, get, insert_get};
 /**
  * number of turned face up cards
  */
-extern session_t currentSession;
 
 class Card;
 class Game;
@@ -73,11 +72,7 @@ public:
 	/**
 	 * change visibility of given card to negated visibility of given card.
 	 */
-	inline void changeVisibility(){
-		this->visible = !this->visible;
-		if (this->visible == true) { currentSession.slot[currentSession.currentGame]->count_cards_end_game++; }
-		else { --count_cards_end_game; }
-	};
+	void changeVisibility();
 };
 
 /**

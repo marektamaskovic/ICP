@@ -11,8 +11,6 @@
 #include "save.h"
 
 extern session_t currentSession;
-int	count_cards_end_game = 0;
-
 
 int session_t::isSpace(void){
 	for(int i = 0; i < 4; i++)
@@ -202,7 +200,10 @@ int createGame(session_t *session){
 		return -1;
 	}
 
-	count_cards_end_game = 0;
+	session->currentGame = pos;
+	session->slot[session->currentGame]->count_cards_end_game = 0;
+
+
 	Color clr;
 	for (int i =0; i < 4; i++){
 		clr = static_cast<Color> (i);
@@ -249,7 +250,7 @@ int createGame(session_t *session){
 		newGame->mainDeck.erase(newGame->mainDeck.end());
 	}
 
-	session->currentGame = pos;
+
 	std::cout << "createGame"
 			  << std::endl
 			  << "Game created and added to slot:"

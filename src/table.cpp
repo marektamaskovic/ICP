@@ -13,7 +13,6 @@
 
 extern session_t currentSession;
 
-
 Table::Table(QWidget *parent, int r, int c) :
     QWidget(parent),
     row(r),
@@ -88,6 +87,19 @@ int Table::update()
             this->decks_ui[i].pop_back();
         }
     }
+
+    qDebug() << "c_end_cards: " << currentSession.slot[curr_game]->count_cards_end_game;
+    if (currentSession.slot[curr_game]->count_cards_end_game == 52){
+//        qDebug() << "You finished Game. Congratulations!\n";
+        finishGame();
+//        qDebug() << "ha";
+        // TODO score + remove game and end session?
+        QMessageBox::information(
+            this,
+            tr("Klondike"),
+            tr("You finished Game. Congratulations!"));
+    }
+
     // update decks
     int k = 0;
     for(int i = 0; i < 13; i++, k++)

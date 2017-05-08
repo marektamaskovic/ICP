@@ -42,9 +42,10 @@ int load_game(std::string &, session_t *);
  *
  * @param[in]  element  iterator where are cards located.
  * @param[out]      deck		here will be stored all loaded cards.
+ * @param[in]  session_t* Pointer to a game session where should this function load the game.
  *
  * @return     If successful returns 0 else non-zero value.
  */
-int load_deck(json::iterator, Deck *);
+int load_deck(json::iterator, Deck *, session_t *);
 
 #endif
