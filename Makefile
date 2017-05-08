@@ -55,9 +55,8 @@ doxygen:
 pack: src/* examples/* doc/ Makefile README.txt
 	zip -r -9 xvasko12_xtamas01.zip $^
 
-#FIXME doxygen doxyfile
 clean:
 	@echo -e "$(RED)=== Cleaning $(NC)"
 	$(RM) $(GUI) $(CLI)
 	@cd src/ && $(MAKE) clean
-	$(RM) -r ./doc/*
+	$(RM) -r ./doc/* xvasko12_xtamas01.zip

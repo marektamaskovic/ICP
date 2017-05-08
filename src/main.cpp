@@ -38,18 +38,22 @@ int main(int argc, char *argv[]){
 
 #ifdef NGUI
 	std::string cmdBuffer = "";
-
-	std::cout << ">>> ";
+	std::cout << "Welcome to Klondike CLI version.\n";
+	std::cout << "authors: Martin Vasko and Marek Tamaskovic\n";
+	std::cout << "For any complains please contact us on email: \nxvasko12@stud.fit.vutbr.cz\n";
+	std::cout << "or\nxtamas01@stud.fit.vutbr.cz\n";
+	std::cout << "Game begins with command 'createGame'.\n";
+	std::cout << "To see all available commands use 'help'\n";
+	std::cout << "Enjoy the game :).\n";
+	std::cout << "\n>>> ";
 	while(getline(std::cin, cmdBuffer)){
-		// std::cout << "Game: " << count_cards_end_game << "\n";
+		std::cout << count_cards_end_game << "\n";
 		if (count_cards_end_game == 52){
 			finishGame();
 			std::cout << "You finished Game. Congratulations!\n";
-			// TODO score + remove game and end session?
 		}
 		if(cmdBuffer == ""){
 			std::cout << std::endl;
-			// break;
 		}
 
 		if(cmdBuffer == "exit()" || cmdBuffer == "exit"){

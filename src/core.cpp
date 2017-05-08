@@ -232,7 +232,12 @@ int createGame(session_t *session){
 
 		for (int i = 4; i <= j; i++){
 			if (i == j){
+
+			#ifndef SHUFFLE
+				std::random_shuffle(newGame->mainDeck.begin(), newGame->mainDeck.end(), myrandom);
+			#endif
 				newGame->mainDeck.front().changeVisibility();
+
 			}
 
 			newGame->decks[j]->insertCard(newGame->mainDeck.front());

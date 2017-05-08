@@ -1,4 +1,4 @@
-﻿###############################################################################
+###############################################################################
 # xTamas01 and xVasko12 presents the ultimate survival Klondike guide         #
 # Project: ICP17, a Klondike (Solitaire) game                                 #
 # FIT VUT Brno                                                                #
@@ -32,9 +32,9 @@ RED=\033[1;31m
 YELLOW=\033[1;33m
 NC=\033[0m
 
-.PHONY: hra2017 hra2017-cli all clean
+.PHONY: $(CLI) $(GUI) all clean
 
-all: hra2017 hra2017-cli
+all: $(CLI) $(GUI)
 
 core.o: core.h core.cpp
 	@echo -e "$(YELLOW)=== BUILDING OBJ $(NC)"
@@ -42,11 +42,11 @@ core.o: core.h core.cpp
 classes.o: classes.h classes.cpp
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c classes.cpp -o $@
 
-hra2017:
+$(GUI):
 	@echo -e "$(GREEN)=== Building GUI $(NC)"
 	qmake 4.pro -o qmakefile
 	make -f qmakefile
-hra2017-cli:$(DEPS)
+$(CLI):$(DEPS)
 	@echo -e "$(GREEN)=== Building CLI $(NC)"
 	$(CXX) -c $(CXXFLAGS) $(LDFLAGS) -DNGUI main.cpp -o main.o
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) main.o $(DEPS) -o $@
