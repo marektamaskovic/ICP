@@ -14,8 +14,6 @@
 #include <iomanip>
 #include "classes.h"
 
-extern int count_cards_end_game;
-
 /**
  * session structure which holds CLI and GUI games, open games and its methods
  */

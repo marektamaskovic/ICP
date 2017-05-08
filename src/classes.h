@@ -33,8 +33,7 @@ enum Permissions{insert=1, get, insert_get};
 /**
  * number of turned face up cards
  */
-extern int count_cards_end_game;
-
+extern session_t currentSession;
 
 class Card;
 class Game;
@@ -76,7 +75,7 @@ public:
 	 */
 	inline void changeVisibility(){
 		this->visible = !this->visible;
-		if (this->visible == true) { ++count_cards_end_game; }
+		if (this->visible == true) { currentSession.slot[currentSession.currentGame]->count_cards_end_game++; }
 		else { --count_cards_end_game; }
 	};
 };
@@ -100,6 +99,7 @@ public:
 	 */
 	Deck *decks [13];
 	int m = 0;
+	int count_cards_end_game = 0;
 
 	Game();								///< Empty constructor
 	Game(const Game &G);				///< Copy constructor of Game

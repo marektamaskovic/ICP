@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
 	std::cout << "\n>>> ";
 	while(getline(std::cin, cmdBuffer)){
 		std::cout << count_cards_end_game << "\n";
-		if (count_cards_end_game == 52){
+		if (currentSession.slot[currentSession.currentGame]->count_cards_end_game == 52){
 			finishGame();
 			std::cout << "You finished Game. Congratulations!\n";
 		}
