@@ -26,38 +26,114 @@ namespace Ui {
     class Table;
 }
 
+/**
+ * @brief      Table class includes all needed components for one game. That includes all buttons, game board with cards and other hidden objects.
+ */
 class Table : public QWidget
 {
     Q_OBJECT
 
 public:
-    // TODO if is game present => not allow creating new one
+    /**
+     * @brief      Constructor
+     *
+     * @param      parent  The parent
+     * @param[in]  r       row where this table is located in main window grid
+     * @param[in]  c       column where this table is located in main window grid
+     */
     explicit Table(QWidget *parent, int r, int c);
+
+    /**
+     * @brief      Destroys the object.
+     */
     ~Table();
+
+    /**
+     * @brief      redraw table
+     *
+     * @return     If successful returns 0 otherwise non-zero value;
+     */
     int update();
-    int show();
-    int send();
+
+    /**
+     * row where this table is located in main window grid
+     */
     int row;
+
+    /**
+     * column where this table is located in main window grid
+     */
     int column;
-    /*
-     * 0-3 - pileau decks
-     * 4-10 - foundation decks
-     * 11 - waste
-     * 12 - stack
+
+    /**
+     * @see deck
+     * All decks in game
+     * 11   = stack
+     * 12   = waste
+     * 0-3  = pileau
+     * 4-10 = foundation
      */
     deck_ui_t decks_ui[13];
+
+    /**
+     * session id
+     */
     int session_id = -1;
+
 private:
+    /**
+     * @brief      Gets the card.
+     *
+     * @param      Card&
+     *
+     * @return     The card as QPushButton.
+     */
     QPushButton *get_card(Card&);
-    Ui::Table *ui;
-    QGridLayout *grid;
-    int draw_table(void);
+
+    /**
+     * @brief      Gets the card name.
+     *
+     * @param      Card*
+     *
+     * @return     The card name.
+     */
     std::string get_card_name(Card*);
+    
+    /**
+     * Ui specifier
+     */
+    Ui::Table *ui;
+
+    /**
+     * Layout for this object.
+     */
+    QGridLayout *grid;
+
 public slots:
+
+    /**
+     * @brief      Creates a game slot.
+     */
     void create_game_slot(void);
+
+    /**
+     * @brief      Loads a game slot.
+     */
     void load_game_slot(void);
+
+    /**
+     * @brief      Saves a game slot.
+     */
     void save_game_slot(void);
+
+    /**
+     * @brief      Hint slot.
+     */
     void hint_slot(void);
+
+    /**
+     * @brief      Undo slot.
+     */
     void undo_slot(void);
 };
 

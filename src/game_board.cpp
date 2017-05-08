@@ -110,9 +110,9 @@ void game_board::send_card()
     }
     const QString s = reinterpret_cast<QPushButton*>(sender())->text();
 //    qDebug() << "card_chosen: " << s;
-    NEXT_MOVE.push_back(s);
+    next_move.push_back(s);
 
-    if(NEXT_MOVE.size() == 2){
+    if(next_move.size() == 2){
         if(q_move_card() == 0)
             qDebug() << "successfuly moved cards!";
         else
@@ -139,22 +139,22 @@ int game_board::q_move_card(){
     command_t *cmd = new command_t;
 
     std::string deck;
-    if(NEXT_MOVE.back()[0] == 'e')
-        deck = NEXT_MOVE.back().toStdString().substr(1);
+    if(next_move.back()[0] == 'e')
+        deck = next_move.back().toStdString().substr(1);
     else
-        deck = find_card_in_deck(NEXT_MOVE.back());
+        deck = find_card_in_deck(next_move.back());
     if(deck == "not_found"){
         return 1;
     }
 
     cmd->type = moveCard_CMD;
     cmd->args.push_back(deck);
-    cmd->args.push_back(NEXT_MOVE.front().toStdString());
+    cmd->args.push_back(next_move.front().toStdString());
 
     moveCardDeco(cmd);
     // update();
-    NEXT_MOVE.pop_back();
-    NEXT_MOVE.pop_back();
+    next_move.pop_back();
+    next_move.pop_back();
     return 0;
 }
 
@@ -191,19 +191,3 @@ std::string game_board::find_card_in_deck(QString &s){
 
     return "not_found";
 }
-
-void game_board::clean_board()
-{
-    delete this->grid;
-    this->grid = new QGridLayout();
-    QWidget *w = new QWidget();
-    w->setStyleSheet("background-image: url(:/t/img/pool_table/pool_table.png);");
-    QVBoxLayout *g = new QVBoxLayout(w);
-    QSpacerItem *s = new QSpacerItem(100, 100, QSizePolicy::Expanding, QSizePolicy::Expanding);
-    g->addItem(s);
-    this->grid->addWidget(w, 0, 0, 8, 8);
-    return;
-
-}
-
-
