@@ -14,19 +14,20 @@
 extern session_t currentSession;
 
 
-Table::Table(QWidget *parent) :
+Table::Table(QWidget *parent, int r, int c) :
     QWidget(parent),
+    row(r),
+    column(c),
     ui(new Ui::Table)
 {
     this->setObjectName("table");
     this->grid = new QGridLayout(this);
-
-    QPushButton *new_game_b     = new QPushButton("New Game");
-    QPushButton *load_game_b    = new QPushButton("Load Game");
-    QPushButton *save_game_b    = new QPushButton("Save Game");
-    QPushButton *undo_b         = new QPushButton("Undo");
-    QPushButton *hint_b         = new QPushButton("Hint");
-    QPushButton *quit_game_b    = new QPushButton("Quit Game");
+    QPushButton *new_game_b     = new QPushButton("New Game", this);
+    QPushButton *load_game_b    = new QPushButton("Load Game", this);
+    QPushButton *save_game_b    = new QPushButton("Save Game", this);
+    QPushButton *undo_b         = new QPushButton("Undo", this);
+    QPushButton *hint_b         = new QPushButton("Hint", this);
+    QPushButton *quit_game_b    = new QPushButton("Quit Game", this);
 
     this->grid->addWidget(new_game_b,     0,0,1,1);
     connect(new_game_b, SIGNAL (released()), this, SLOT (create_game_slot()));
@@ -44,7 +45,7 @@ Table::Table(QWidget *parent) :
     connect(hint_b, SIGNAL (released()), this, SLOT (hint_slot()));
 
     this->grid->addWidget(quit_game_b,    0,5,1,1);
-    connect(quit_game_b, SIGNAL (released()), this, SLOT (quit_game_slot()));
+    connect(quit_game_b, SIGNAL (released()), this->parent(), SLOT (delete_t()));
 
     QSpacerItem *spacer = new QSpacerItem(1, 2, QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->grid->addItem(spacer, 2, 0, 1, 8);
@@ -71,10 +72,10 @@ int Table::update()
 {
     game_board *g = this->findChild<game_board*>("game_board");
     if(g == nullptr){
-        qDebug() << "alsjdh";
+        qDebug() << "something just fucked up. game_board not found. table::update()";
         return 1;
     }
-    qDebug() << "updating table no." << session_id;
+//    qDebug() << "updating table no." << session_id;
     int curr_game = session_id;
     Game *game = currentSession.slot[curr_game];
     currentSession.currentGame = session_id;
@@ -82,7 +83,6 @@ int Table::update()
 
     for(int i = 0; i < 13; i++)
     {
-//        qDebug() << "Cleaning deck: " << i;
         while(this->decks_ui[i].size() > 0)
         {
             this->decks_ui[i].pop_back();
@@ -92,15 +92,15 @@ int Table::update()
     int k = 0;
     for(int i = 0; i < 13; i++, k++)
     {
-        int j = 4;
+//        for(int j = 0; j < game->decks[i]->cards.size(); j++){
+//            this->decks_ui[i].push_back(this->get_card(game->decks[i]->cards.at(j)));
+//        }
         for(auto card = game->decks[i]->cards.begin();
             card != game->decks[i]->cards.end();
-            card++, j++)
+            card++)
         {
             this->decks_ui[i].push_back(this->get_card(*card));
-//            this->grid->addWidget(this->get_card(*card), j,k,1,1);
         }
-//        qDebug() << i << " : " << this->decks_ui[i].length();
     }
 
     g->update(this->decks_ui);
@@ -113,8 +113,6 @@ int Table::update()
 
 QPushButton *Table::get_card(Card &c)
 {
-    // FIXME only prototype
-    // TODO fix QLabel to card object with background
 
     std::string name = "";
 
@@ -143,7 +141,7 @@ QPushButton *Table::get_card(Card &c)
         //TODO clean up and exit
     }
 
-    std::string style = "background-image:url(':/t/img/cards/";
+    std::string style = "font-size: 1pt; border: none; background-image:url(':/t/img/cards/";
     if(c.visible){
         switch(c.color){
             case(Club): style.append("C"); break;
@@ -152,16 +150,42 @@ QPushButton *Table::get_card(Card &c)
             case(Heart): style.append("H"); break;
         }
         style.append(std::to_string(c.number));
-        style.append(".gif') 0 0 0 0 stretch stretch");
+        style.append(".gif') 0 0 0 0 stretch stretch;");
     }
     else{
-        style.append("B.png') 0 0 0 0 stretch stretch");
+        style.append("B.png') 0 0 0 0 stretch stretch;");
     }
     label->setStyleSheet(style.data());
     label->setMaximumWidth(145);
     label->setMinimumSize(145, 202);
 
     return label;
+}
+
+std::string Table::get_card_name(Card *card)
+{
+#if defined(_WIN32) || defined(__MSDOS__)
+   #define SPADE   "\x06"
+   #define CLUB    "\x05"
+   #define HEART   "\x03"
+   #define DIAMOND "\x04"
+#else
+   #define SPADE   "\xE2\x99\xA0"
+   #define CLUB    "\xE2\x99\xA3"
+   #define HEART   "\xE2\x99\xA5"
+   #define DIAMOND "\xE2\x99\xA6"
+#endif
+
+    std::string type;
+    switch(card->color){
+        case(Heart): type = HEART; break;
+        case(Spade): type = SPADE; break;
+        case(Club): type = CLUB; break;
+        case(Diamond): type = DIAMOND; break;
+    }
+
+    std::string return_str = std::to_string(card->number) + type;
+    return return_str;
 }
 
 void Table::create_game_slot(void)
@@ -192,6 +216,7 @@ void Table::load_game_slot(void)
     }
     std::string a = filename.toStdString();
     load_game(a, &currentSession);
+    session_id = currentSession.currentGame;
     qDebug() << "Loading game from: " << currentSession.currentGame << "\n";
     this->update();
 }
@@ -229,10 +254,13 @@ void Table::hint_slot()
     }
 
     Move *storeMove = currentSession.slot[currentSession.currentGame]->hint();
-    std::string text = "Move from:";
-    text.append(std::to_string(storeMove->from));
-    text.append(" to: ");
-    text.append(std::to_string(storeMove->to));
+    std::string card_name = get_card_name(storeMove->card);
+    std::string text = "Move card: ";
+    text.append(card_name);
+    text.append(" from deck: ");
+    text.append(std::to_string(storeMove->from - 3));
+    text.append(" to deck: ");
+    text.append(std::to_string(storeMove->to - 3));
     QMessageBox::information(
         this,
         tr("Klondike"),
@@ -252,18 +280,3 @@ void Table::undo_slot()
     qApp->processEvents();
 }
 
-void Table::quit_game_slot()
-{
-    qDebug() << "session_id: " << session_id;
-    if(this->session_id < 0){
-        qDebug() << "QUIT ERROR U FAG!";
-        return;
-    }
-    currentSession.openSlot[this->session_id] = false;
-    delete currentSession.slot[this->session_id];
-    session_id = -1;
-
-    game_board *g = this->findChild<game_board*>("game_board");
-    g->clean_board();
-    this->repaint();
-}

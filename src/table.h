@@ -32,12 +32,13 @@ class Table : public QWidget
 
 public:
     // TODO if is game present => not allow creating new one
-    explicit Table(QWidget *parent);
+    explicit Table(QWidget *parent, int r, int c);
     ~Table();
     int update();
     int show();
     int send();
-
+    int row;
+    int column;
     /*
      * 0-3 - pileau decks
      * 4-10 - foundation decks
@@ -51,13 +52,13 @@ private:
     Ui::Table *ui;
     QGridLayout *grid;
     int draw_table(void);
+    std::string get_card_name(Card*);
 public slots:
     void create_game_slot(void);
     void load_game_slot(void);
     void save_game_slot(void);
     void hint_slot(void);
     void undo_slot(void);
-    void quit_game_slot(void);
 };
 
 #endif // TABLE_H

@@ -74,7 +74,7 @@ int game_board::update(QVector<QPushButton *> *list)
                 connect(label, SIGNAL (released()), this, SLOT(waste_card()));
             else
                 connect(label, SIGNAL (released()), this, SLOT(send_card()));
-            std::string style = "background-image: url(:/img/cards/foundation.png);";
+            std::string style = "font-size: 1pt; border: none; background-image: url(:/img/cards/foundation.png);";
             label->setStyleSheet(style.data());
             label->setMaximumWidth(145);
             label->setMinimumSize(145, 202);
@@ -109,7 +109,7 @@ void game_board::send_card()
         return;
     }
     const QString s = reinterpret_cast<QPushButton*>(sender())->text();
-    qDebug() << "card_chosen: " << s;
+//    qDebug() << "card_chosen: " << s;
     NEXT_MOVE.push_back(s);
 
     if(NEXT_MOVE.size() == 2){
@@ -127,7 +127,7 @@ void game_board::waste_card()
         qDebug() << "WASTE CARD ERROR U FAG";
         return;
     }
-    qDebug() << "waste_card()";
+//    qDebug() << "waste_card()";
     int curr_id = reinterpret_cast<Table*>(parent())->session_id;
     currentSession.slot[curr_id]->decks[12]->dequeue(currentSession.slot[curr_id]->decks[11]);
     reinterpret_cast<Table*>(parent())->update();

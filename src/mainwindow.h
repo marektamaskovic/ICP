@@ -14,7 +14,10 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    QGridLayout *grid;
     ~MainWindow();
+public slots:
+    void delete_t();
 
 private:
     Ui::MainWindow *ui;

@@ -145,7 +145,7 @@ FILE_PATTERNS          = *.c \
                          *.ucf \
                          *.qsf
                          RECURSIVE              = YES
-EXCLUDE                =
+EXCLUDE                = json.hpp
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        =
