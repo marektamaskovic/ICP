@@ -1,5 +1,5 @@
 #include "save.h"
-
+#include "core.h"
 
 int save(std::string &filename, Game &g){
 	std::cout << "save" << std::endl;
@@ -65,7 +65,7 @@ int load_game(std::string &filename, session_t *session){
 		deck->deck = deck_index;
 		load_deck(it, deck);
 		g->decks[deck_index] = deck;
-		std::cout << g->decks[deck_index]->cards.size() << std::endl;
+//		std::cout << g->decks[deck_index]->cards.size() << std::endl;
 		++deck_index;
 	}
 
@@ -83,7 +83,9 @@ int load_deck(json::iterator element, Deck *deck){
 	for(auto& card: (*element)["cards"]){
 		Card *c = new Card(static_cast<int>(card["number"]), static_cast<Color>(card["color"]), card["visible"]);
 		deck->cards.push_back(*c);
-		delete(c); ++i;
+        if(c->visible)
+            count_cards_end_game++;
+        delete(c); ++i;
 	}
 	// std::cout << i << " " << deck->cards.size() << std::endl;
 
