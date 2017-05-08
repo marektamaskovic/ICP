@@ -1,3 +1,4 @@
+*.stash
 *.xcf
 CppCoreGuidelines_CppCoreGuidelines.pdf
 *.o
