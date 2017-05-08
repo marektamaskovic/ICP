@@ -280,7 +280,6 @@ void Game::showGame(){
 	}
 }
 
-// TODO dokoncit
 Move* Game::hint(){
 	Card cardFrom;
 	int result;
