@@ -69,7 +69,6 @@ int load_game(std::string &filename, session_t *session){
 		++deck_index;
 	}
 
-
 	return 0;
 }
 
@@ -83,6 +82,8 @@ int load_deck(json::iterator element, Deck *deck){
 	for(auto& card: (*element)["cards"]){
 		Card *c = new Card(static_cast<int>(card["number"]), static_cast<Color>(card["color"]), card["visible"]);
 		deck->cards.push_back(*c);
+		if (c->visible)
+			count_cards_end_game++;
 		delete(c); ++i;
 	}
 	// std::cout << i << " " << deck->cards.size() << std::endl;

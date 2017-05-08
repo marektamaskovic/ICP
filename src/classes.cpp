@@ -585,12 +585,14 @@ void finishGame(){
 	unsigned secondSize;
 
 	for (unsigned maximumSize = 1 ; maximumSize != 0;--maximumSize){
-		for (int i = 4; i < 11; ++i){
+		for (int i = 4; i < 12; ++i){
 			secondSize = currentSession.slot[curr]->decks[i]->cards.size();
 
 			maximumSize = std::max(maximumSize, secondSize);
-			if (currentSession.slot[curr]->decks[i]->cards.size() != 0)
+			if (currentSession.slot[curr]->decks[i]->cards.size() != 0){
 				fromCard = currentSession.slot[curr]->decks[i]->cards.back();
+			}
+
 			for(int j = 0; j < 4; ++j){
 				result = currentSession.slot[curr]->decks[j]->checkValidity(fromCard);
 				if (result == 0){
