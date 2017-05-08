@@ -33,8 +33,6 @@ enum Permissions{insert=1, get, insert_get};
 /**
  * number of turned face up cards
  */
-extern int count_cards_end_game;
-
 
 class Card;
 class Game;
@@ -74,11 +72,7 @@ public:
 	/**
 	 * change visibility of given card to negated visibility of given card.
 	 */
-	inline void changeVisibility(){
-		this->visible = !this->visible;
-		if (this->visible == true) { ++count_cards_end_game; }
-		else { --count_cards_end_game; }
-	};
+	void changeVisibility();
 };
 
 /**
@@ -100,6 +94,7 @@ public:
 	 */
 	Deck *decks [13];
 	int m = 0;
+	int count_cards_end_game = 0;
 
 	Game();								///< Empty constructor
 	Game(const Game &G);				///< Copy constructor of Game

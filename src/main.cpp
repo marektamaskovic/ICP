@@ -27,7 +27,6 @@
 
 
 extern int position[];
-extern int count_cards_end_game;
 
 session_t currentSession;
 
@@ -47,11 +46,6 @@ int main(int argc, char *argv[]){
 	std::cout << "Enjoy the game :).\n";
 	std::cout << "\n>>> ";
 	while(getline(std::cin, cmdBuffer)){
-		std::cout << count_cards_end_game << "\n";
-		if (count_cards_end_game == 52){
-			finishGame();
-			std::cout << "You finished Game. Congratulations!\n";
-		}
 		if(cmdBuffer == ""){
 			std::cout << std::endl;
 		}
@@ -61,6 +55,10 @@ int main(int argc, char *argv[]){
 		}
 		else{
 			resolveCmd(&currentSession, cmdBuffer);
+			if (currentSession.slot[currentSession.currentGame]->count_cards_end_game == 52){
+				finishGame();
+				std::cout << "You finished Game. Congratulations!\n";
+			}
 		}
 
 		std::cout << ">>> ";

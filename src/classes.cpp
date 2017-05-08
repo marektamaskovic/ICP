@@ -96,6 +96,16 @@ void Card::printCard(){
 		std::cout << "( # ),  ";
 }
 
+void Card::changeVisibility(){
+	this->visible = !this->visible;
+	if (this->visible == true) {
+		currentSession.slot[currentSession.currentGame]->count_cards_end_game++;
+	}
+	else {
+		currentSession.slot[currentSession.currentGame]->count_cards_end_game--;
+	}
+}
+
 
 bool Card::operator==(const Card &rCard){
 	return this->number == rCard.number && this->color == rCard.color;
@@ -200,7 +210,9 @@ int Deck::dequeue(Deck *other){
 			return 0;
 		}
 		else{
-
+			if (!other->cards.empty()){
+				other->cards.back().changeVisibility();
+			}
 			other->cards.push_back(this->cards.front());
 			// to flop, change visibility
 			other->cards.back().changeVisibility();

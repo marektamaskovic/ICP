@@ -63,7 +63,7 @@ int load_game(std::string &filename, session_t *session){
 		Deck *deck = new Deck();
 
 		deck->deck = deck_index;
-		load_deck(it, deck);
+		load_deck(it, deck, session);
 		g->decks[deck_index] = deck;
 //		std::cout << g->decks[deck_index]->cards.size() << std::endl;
 		++deck_index;
@@ -72,7 +72,7 @@ int load_game(std::string &filename, session_t *session){
 	return 0;
 }
 
-int load_deck(json::iterator element, Deck *deck){
+int load_deck(json::iterator element, Deck *deck, session_t *session){
 	// std::cout << deck->deck << std::endl;
 	deck->permissions = (*element)["permissions"];
 	deck->position = (*element)["position"];
@@ -83,7 +83,7 @@ int load_deck(json::iterator element, Deck *deck){
 		Card *c = new Card(static_cast<int>(card["number"]), static_cast<Color>(card["color"]), card["visible"]);
 		deck->cards.push_back(*c);
 		if (c->visible)
-			count_cards_end_game++;
+			session->slot[session->currentGame]->count_cards_end_game++;
 		delete(c); ++i;
 	}
 	// std::cout << i << " " << deck->cards.size() << std::endl;

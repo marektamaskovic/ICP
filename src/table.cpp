@@ -12,7 +12,6 @@
 #include "mainwindow.h"
 
 extern session_t currentSession;
-extern int count_cards_end_game;
 
 Table::Table(QWidget *parent, int r, int c) :
     QWidget(parent),
@@ -89,8 +88,8 @@ int Table::update()
         }
     }
 
-    qDebug() << "c_end_cards: " << count_cards_end_game;
-    if (count_cards_end_game == 52){
+    qDebug() << "c_end_cards: " << currentSession.slot[curr_game]->count_cards_end_game;
+    if (currentSession.slot[curr_game]->count_cards_end_game == 52){
 //        qDebug() << "You finished Game. Congratulations!\n";
         finishGame();
 //        qDebug() << "ha";
