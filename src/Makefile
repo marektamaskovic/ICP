@@ -1,4 +1,4 @@
-###############################################################################
+﻿###############################################################################
 # xTamas01 and xVasko12 presents the ultimate survival Klondike guide         #
 # Project: ICP17, a Klondike (Solitaire) game                                 #
 # FIT VUT Brno                                                                #
@@ -7,6 +7,17 @@
 # Makefile supports various types of architectures, machines and much more... #
 # supports commands: make, make clean, make gui, make cli, make zip, make run #
 ###############################################################################
+
+#variables of compilation
+ifeq ($(OS),Windows_NT)
+	#REMOVE =del
+	GUI=hra2017.exe
+	CLI=hra2017-cli.exe
+else
+	#libraries
+	GUI=hra2017
+	CLI=hra2017-cli
+endif
 
 CXX=g++
 CXXFLAGS=-Wall -Wextra -Werror -pedantic -std=c++11 -Weffc++ -g3
