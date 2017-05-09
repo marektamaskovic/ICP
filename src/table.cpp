@@ -88,7 +88,6 @@ int Table::update()
         }
     }
 
-    qDebug() << "c_end_cards: " << currentSession.slot[curr_game]->count_cards_end_game;
     if (currentSession.slot[curr_game]->count_cards_end_game == 52){
 //        qDebug() << "You finished Game. Congratulations!\n";
         finishGame();

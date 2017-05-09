@@ -58,5 +58,5 @@ pack: src/* examples/* doc/ Makefile README.txt
 clean:
 	@echo -e "$(RED)=== Cleaning $(NC)"
 	$(RM) $(GUI) $(CLI)
-	@cd src/ && $(MAKE) clean
 	$(RM) -r ./doc/* xvasko12_xtamas01.zip
+	@cd src/ && $(MAKE) clean
