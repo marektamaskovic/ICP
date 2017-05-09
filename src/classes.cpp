@@ -200,23 +200,24 @@ int Deck::dequeue(Deck *other){
 			currentSession.slot[currentSession.currentGame]->
 				history.push_back({11, 12, c, true});
 
+			if (other->cards.size() != 0)
+				other->cards.back().changeVisibility();
 			for (unsigned i = 0; i != other->cards.size();){
-				// Again from start
-				other->cards.front().changeVisibility();
-				this->cards.push_back(other->cards.front());
-				other->cards.erase(other->cards.begin());
+				this->cards.push_back(other->cards.back());
+				other->cards.pop_back();
 			}
 
 			return 0;
 		}
 		else{
-			if (!other->cards.empty()){
-				other->cards.back().changeVisibility();
+			this->cards.back().changeVisibility();
+
+			other->cards.push_back(this->cards.back());
+			if (other->cards.size() > 1){
+				std::cout << other->cards.size();
+				other->cards[other->cards.size()-2].changeVisibility();
 			}
-			other->cards.push_back(this->cards.front());
-			// to flop, change visibility
-			other->cards.back().changeVisibility();
-			this->cards.erase(this->cards.begin());
+			this->cards.pop_back();
 
 			Card *c = new Card(other->cards.back());
 			currentSession.slot[currentSession.currentGame]->
