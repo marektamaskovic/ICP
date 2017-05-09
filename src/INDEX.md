@@ -18,6 +18,10 @@ how to make such nice game with help of object oriented programming (OOP).
 Everything is made in c++ with some Makefile compilation mechanics. This game
 is not OS(Operation system) binded.
 
+__Design:__
+
+![ERD](../../src/img/erd.png)
+
 __Sumary:__
 
 Overal work on this project
@@ -25,4 +29,6 @@ Overal work on this project
 * about 100 hours of coding GUI (Learning QT, building, fixing, changing design, problems with implementations before, make abstraction for some methods and functions).
 * about 5 hours of object oriented design.
 
-__Conclusion:__ spend more time on design than on implementation.
+__Conclusion:__
+
+Spend more time on design than on implementation.
