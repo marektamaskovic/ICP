@@ -214,7 +214,6 @@ int Deck::dequeue(Deck *other){
 
 			other->cards.push_back(this->cards.back());
 			if (other->cards.size() > 1){
-				std::cout << other->cards.size();
 				other->cards[other->cards.size()-2].changeVisibility();
 			}
 			this->cards.pop_back();

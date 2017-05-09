@@ -45,9 +45,9 @@ travis_compile:
 	@cd src/ && $(MAKE) hra2017-cli-tr
 	cp src/hra2017-cli ./hra2017-cli
 
-run:
-	./hra2017
-	./hra2017-cli
+run: all
+	./$(GUI) &
+	./$(CLI)
 
 doxygen:
 	cd src/ && doxygen doxyfile
