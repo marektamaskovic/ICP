@@ -529,7 +529,6 @@ std::vector<Move> undo(std::vector<Move> moveSession){
 		/*******************************************/
 		if (deckNumber == 12){
 			it = currentSession.slot[curr]->decks[from]->cards.begin();
-
 			if (moveSession.back().turnedUp == true)
 				moveSession.back().card->changeVisibility();
 			currentSession.slot[curr]->decks[from]->cards.
@@ -538,6 +537,7 @@ std::vector<Move> undo(std::vector<Move> moveSession){
 			it = currentSession.slot[curr]->decks[to]->cards.end();
 
 			currentSession.slot[curr]->decks[to]->cards.erase(it);
+			currentSession.slot[curr]->decks[to]->cards.back().changeVisibility();
 		}
 
 		/******************************************************/
@@ -546,12 +546,12 @@ std::vector<Move> undo(std::vector<Move> moveSession){
 		else if (deckNumber == 11 && to == 12){
 			unsigned size = currentSession.slot[curr]->decks[to]->cards.size();
 			for (unsigned i = 0; i < size;++i){
-				it = currentSession.slot[curr]->decks[from]->cards.end();
-				currentSession.slot[curr]->decks[to]->cards[i].changeVisibility();
+				it = currentSession.slot[curr]->decks[from]->cards.begin();
 
 				currentSession.slot[curr]->decks[from]->cards.insert(it,currentSession.slot[curr]->decks[to]->cards[i]);
 				currentSession.slot[curr]->decks[to]->cards.pop_back();
 			}
+			currentSession.slot[curr]->decks[from]->cards.back().changeVisibility();
 		}
 
 		/**************************************************/
