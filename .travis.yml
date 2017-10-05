@@ -27,4 +27,4 @@ script:
   - export CC=/usr/bin/gcc-6
   - export CXX=/usr/bin/g++-6
   - gcc -v && g++ -v && cmake --version
-  - make travis_compile && make run
+  - make travis_compile
